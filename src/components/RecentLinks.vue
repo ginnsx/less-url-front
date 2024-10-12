@@ -1,9 +1,12 @@
 <template>
   <div class="recent-links">
-    <n-h3>最近创建的链接</n-h3>
+    <n-h3 class="gradient-text">最近创建的链接</n-h3>
     <n-list v-if="displayedLinks.length" hoverable clickable>
       <n-list-item v-for="link in displayedLinks" :key="link.id" @click="toggleExpand(link)">
-        <n-thing :title="link.shortUrl" :content-style="{ margin: '8px 0' }">
+        <n-thing :content-style="{ margin: '8px 0' }">
+          <template #header>
+            <n-text class="short-url">{{ link.shortUrl }}</n-text>
+          </template>
           <template #header-extra>
             <n-tag type="info" size="small"> 点击次数: {{ link.clicks }} </n-tag>
           </template>
@@ -47,12 +50,16 @@
                       <n-input-group>
                         <n-input-group-label>短链接</n-input-group-label>
                         <n-input :value="link.shortUrl" readonly />
-                        <n-button @click.stop="copyToClipboard(link.shortUrl)">复制</n-button>
+                        <n-button @click.stop="copyToClipboard(link.shortUrl)" class="copy-button">
+                          复制
+                        </n-button>
                       </n-input-group>
                       <n-input-group>
                         <n-input-group-label>原始链接</n-input-group-label>
                         <n-input :value="link.longUrl" readonly />
-                        <n-button @click.stop="copyToClipboard(link.longUrl)">复制</n-button>
+                        <n-button @click.stop="copyToClipboard(link.longUrl)" class="copy-button">
+                          复制
+                        </n-button>
                       </n-input-group>
                       <n-flex vertical :size="8">
                         <n-flex align="center">
@@ -75,10 +82,10 @@
                             type="primary"
                             size="large"
                             @click.stop="goToAnalytics(link.id)"
+                            class="analytics-button"
                           >
                             查看详细分析
                           </n-button>
-                          <n-text depth="3">点击查看链接的访问统计和详细分析</n-text>
                         </n-flex>
                       </n-flex>
                     </n-flex>
@@ -96,7 +103,7 @@
       </n-list-item>
     </n-list>
     <n-empty v-else description="暂无最近创建的链接" />
-    <n-button v-if="hasMoreLinks" @click="loadMore" block>加载更多</n-button>
+    <n-button size="large" v-if="hasMoreLinks" @click="loadMore" block> 加载更多 </n-button>
   </div>
 </template>
 
@@ -187,5 +194,42 @@ const getExpirationTagType = (expiresAt: number) => {
 <style scoped>
 .expanded-content {
   margin-top: 16px;
+}
+
+.recent-links {
+  border-radius: 15px;
+  animation: fadeIn 0.5s ease-out;
+}
+
+.gradient-text {
+  font-size: 1.8rem;
+  margin-bottom: 20px;
+}
+
+.short-url {
+  font-size: 1.2rem;
+  font-weight: bold;
+}
+
+.copy-button,
+.analytics-button {
+  transition: all 0.3s ease;
+}
+
+.copy-button:hover,
+.analytics-button:hover {
+  transform: scale(1.05);
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+}
+
+:deep(.n-list-item) {
+  border-radius: 10px;
+  margin-bottom: 10px;
+  transition: all 0.3s ease;
+}
+
+:deep(.n-list-item:hover) {
+  transform: translateY(-3px);
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
 }
 </style>

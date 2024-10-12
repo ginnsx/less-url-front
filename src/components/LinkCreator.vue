@@ -1,13 +1,21 @@
 <template>
   <div class="link-creator">
-    <n-form ref="formRef" :label-width="80" :model="model" :rules="rules">
-      <n-form-item path="longUrl" label="长链接">
+    <n-form
+      ref="formRef"
+      :model="model"
+      :rules="rules"
+      label-placement="left"
+      label-width="auto"
+      require-mark-placement="right-hanging"
+      size="large"
+    >
+      <n-form-item path="longUrl" label="原始链接">
         <n-input
           v-model:value="model.longUrl"
           size="large"
           round
           show-count
-          placeholder="输入长链接..."
+          placeholder="请输入需要缩短的链接"
           :count-graphemes="countGraphemes"
           :maxlength="maxUrlLength"
           @keydown.enter.prevent
@@ -15,7 +23,7 @@
       </n-form-item>
 
       <n-collapse-transition :show="showAdvancedSettings">
-        <n-form-item label="高级设置">
+        <n-form-item label="高级设置" class="advanced-settings">
           <n-grid :cols="2" :x-gap="12">
             <n-form-item-gi path="customAlias">
               <n-input
@@ -43,7 +51,7 @@
       </n-collapse-transition>
 
       <n-form-item>
-        <n-button @click="toggleAdvancedSettings" ghost size="medium">
+        <n-button @click="toggleAdvancedSettings" ghost size="medium" class="toggle-button">
           {{ showAdvancedSettings ? '隐藏高级设置' : '显示高级设置' }}
         </n-button>
       </n-form-item>
@@ -52,13 +60,14 @@
         <n-col :span="24">
           <div style="display: flex; justify-content: flex-end">
             <n-button
+              class="create-button"
               :disabled="!model.longUrl"
               round
               type="primary"
               @click="handleCreateLink"
               :loading="loading"
             >
-              生成短链
+              创建短链接
             </n-button>
           </div>
         </n-col>
@@ -69,6 +78,7 @@
       status="success"
       title="短链接已生成"
       :description="copied ? '已复制' : '点击下方链接复制'"
+      style="padding: 20px"
     >
       <template #footer>
         <n-button
@@ -241,3 +251,35 @@ const disablePreviousTime = () => {
   }
 }
 </script>
+<style scoped>
+.link-creator {
+  margin-bottom: 20px;
+  transition: all 0.3s ease;
+  border-radius: 15px;
+}
+
+.create-button {
+  border: none;
+  transition: all 0.3s ease;
+}
+
+.create-button:hover {
+  transform: scale(1.05);
+  box-shadow: 0 5px 15px rgba(255, 154, 158, 0.4);
+}
+
+.toggle-button {
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  transition: all 0.3s ease;
+}
+
+.toggle-button:hover {
+  background: rgba(255, 255, 255, 0.1);
+  transform: translateY(-2px);
+}
+
+.advanced-settings {
+  animation: fadeIn 0.5s ease-out;
+}
+</style>

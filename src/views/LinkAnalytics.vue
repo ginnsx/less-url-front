@@ -73,7 +73,7 @@ onMounted(async () => {
 
 <style scoped>
 .link-analytics {
-  max-width: 1200px;
+  max-width: 1000px;
   margin: 0 auto;
   height: 100%;
   display: flex;

@@ -3,32 +3,47 @@
     <n-message-provider>
       <n-notification-provider>
         <n-config-provider :theme="theme" :locale="zhCN" :date-locale="dateZhCN">
-          <n-layout class="layout">
-            <n-layout-header bordered class="header">
-              <div class="header-content">
-                <router-link to="/" class="logo-link">
-                  <n-text>LessURL</n-text>
-                </router-link>
-                <div class="header-right">
-                  <n-menu mode="horizontal" :options="menuOptions" :value="activeKey" />
-                  <n-button circle @click="toggleTheme">
-                    <template #icon>
-                      <n-icon size="18">
-                        <sunny-outline v-if="isDarkTheme" />
-                        <moon-outline v-else />
-                      </n-icon>
-                    </template>
-                  </n-button>
+          <div class="app-container">
+            <n-layout content-class="layout" :native-scrollbar="false">
+              <n-layout-header bordered class="header">
+                <div class="header-content">
+                  <router-link to="/" class="logo-link">
+                    <n-text class="logo-text">LessURL</n-text>
+                  </router-link>
+                  <div class="header-right">
+                    <n-menu mode="horizontal" :options="menuOptions" :value="activeMenu" />
+                    <n-button
+                      text
+                      style="font-size: 24px"
+                      @click="toggleTheme"
+                      class="theme-toggle"
+                    >
+                      <template #icon>
+                        <n-icon size="22">
+                          <sunny-outline v-if="isDarkTheme" />
+                          <moon-outline v-else />
+                        </n-icon>
+                      </template>
+                    </n-button>
+                  </div>
                 </div>
-              </div>
-            </n-layout-header>
-            <n-layout-content content-style="padding: 24px; flex-grow: 1;">
-              <router-view></router-view>
-            </n-layout-content>
-            <n-layout-footer bordered class="footer">
-              <n-text>LessURL © {{ new Date().getFullYear() }}</n-text>
-            </n-layout-footer>
-          </n-layout>
+              </n-layout-header>
+              <n-layout-content
+                class="content"
+                content-style="padding: 24px; flex-grow: 1;"
+                :native-scrollbar="false"
+              >
+                <router-view v-slot="{ Component }">
+                  <transition name="fade" mode="out-in">
+                    <component :is="Component" />
+                  </transition>
+                </router-view>
+              </n-layout-content>
+              <n-layout-footer bordered class="footer">
+                <n-text>LessURL © {{ new Date().getFullYear() }}</n-text>
+              </n-layout-footer>
+            </n-layout>
+          </div>
         </n-config-provider>
       </n-notification-provider>
     </n-message-provider>
@@ -68,7 +83,7 @@ const toggleTheme = () => {
 }
 
 const route = useRoute()
-const activeKey = computed(() => route.name as string)
+const activeMenu = computed(() => route.name as string)
 
 // 定义导航菜单
 const menuOptions = [
@@ -84,21 +99,33 @@ const menuOptions = [
 </script>
 
 <style>
+.app-container {
+  min-height: 100vh;
+}
+
 .layout {
   min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.content {
+  flex: 1;
 }
 
 .header {
   padding: 0 24px;
+  backdrop-filter: blur(10px);
+  background-color: rgba(255, 255, 255, 0.1);
+  height: var(--header-height);
 }
 
 .header-content {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  max-width: 1200px;
+  max-width: 1000px;
   margin: 0 auto;
-  height: 64px;
 }
 
 .header-right {
@@ -110,42 +137,86 @@ const menuOptions = [
 .footer {
   text-align: center;
   padding: 24px;
-}
-
-.logo-link {
-  font-size: 24px;
-  font-weight: bold;
-  color: #000;
-  text-decoration: none;
-  transition: color 0.3s ease;
-}
-
-.logo-link:hover {
-  color: #007bff;
-}
-
-#app {
-  font-family: 'Roboto', Avenir, Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-}
-
-/* 新增样式 */
-:deep(.n-menu.n-menu--horizontal) {
+  backdrop-filter: blur(10px);
+  background-color: rgba(255, 255, 255, 0.1);
   height: 64px;
 }
 
-:deep(.n-menu.n-menu--horizontal .n-menu-item-content) {
+.logo-link {
+  text-decoration: none;
+  transition: transform 0.3s ease;
+}
+
+.logo-link:hover {
+  transform: scale(1.05);
+}
+
+.logo-text {
+  font-size: 24px;
+  font-weight: bold;
+  background: linear-gradient(45deg, #00b09b 0%, #96c93d 99%, #96c93d 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.theme-toggle {
+  transition: transform 0.3s ease;
+}
+
+.theme-toggle:hover {
+  transform: rotate(30deg);
+}
+
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity 0.3s ease;
+}
+
+.fade-enter-from,
+.fade-leave-to {
+  opacity: 0;
+}
+
+.n-menu.n-menu--horizontal {
+  height: 64px;
+  background-color: transparent;
+}
+
+.n-menu.n-menu--horizontal .n-menu-item-content {
   height: 64px;
   line-height: 64px;
   padding: 0 20px;
 }
 
-:deep(.n-menu.n-menu--horizontal .n-menu-item-content__icon) {
+.n-menu.n-menu--horizontal .n-menu-item-content__icon {
   margin-right: 6px;
 }
 
-:deep(.n-menu.n-menu--horizontal .n-menu-item-content.n-menu-item-content--selected) {
+.n-menu.n-menu--horizontal .n-menu-item-content.n-menu-item-content--selected {
   font-weight: bold;
+  color: #fff;
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateX(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 </style>
