@@ -91,6 +91,9 @@
     "useDialog": true,
     "useLoadingBar": true,
     "useMessage": true,
-    "useNotification": true
+    "useNotification": true,
+    "osThemeRef": true,
+    "useThemesStore": true,
+    "Link": true
   }
 }

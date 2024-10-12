@@ -132,6 +132,7 @@ import {
 import dayjs from 'dayjs'
 import { useMessage } from 'naive-ui'
 import QRCode from './QRCode.vue'
+
 const linksStore = useLinksStore()
 const displayCount = ref(5)
 const expandedLinks = ref<string[]>([])
@@ -176,10 +177,7 @@ const goToAnalytics = (linkId: string) => {
 
 const getExpirationTagType = (expiresAt: number) => {
   const now = new Date()
-  const expirationDate = new Date(expiresAt)
-  const daysUntilExpiration = Math.ceil(
-    (expirationDate.getTime() - now.getTime()) / (1000 * 60 * 60 * 24)
-  )
+  const daysUntilExpiration = Math.ceil((expiresAt - now.getTime()) / (1000 * 60 * 60 * 24))
 
   if (daysUntilExpiration < 0) {
     return 'error'

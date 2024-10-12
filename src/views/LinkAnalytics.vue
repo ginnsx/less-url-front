@@ -78,6 +78,7 @@ onMounted(async () => {
   height: 100%;
   display: flex;
   flex-direction: column;
+  animation: fadeIn 0.5s ease-out;
 }
 
 .n-card {

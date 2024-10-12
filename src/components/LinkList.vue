@@ -7,14 +7,14 @@
       @update:page="handlePageChange"
       :bordered="false"
       :single-line="true"
-      :scroll-x="1600"
+      :scroll-x="1800"
     />
   </div>
 </template>
 
 <script setup lang="ts">
 import { h, computed, ref, onMounted } from 'vue'
-import { useLinksStore } from '@/stores/links'
+import { type Link, useLinksStore } from '@/stores/links'
 import {
   NDataTable,
   type DataTableColumns,
@@ -26,7 +26,6 @@ import {
 } from 'naive-ui'
 import { RouterLink } from 'vue-router'
 import dayjs from 'dayjs'
-import type { Link } from '@/stores/links'
 import { useMessage } from 'naive-ui'
 
 const linksStore = useLinksStore()
@@ -78,7 +77,28 @@ const columns: DataTableColumns<Link> = [
     title: '过期日期',
     key: 'expiresAt',
     render(row) {
-      return dayjs(row.expiresAt).format('YYYY-MM-DD HH:mm')
+      return h(
+        NTag,
+        {
+          bordered: false,
+          type: getExpirationTagType(row.expiresAt),
+        },
+        { default: () => dayjs(row.expiresAt).format('YYYY-MM-DD HH:mm') }
+      )
+    },
+  },
+  {
+    title: '是否自定义',
+    key: 'isCustom',
+    render(row) {
+      return h(
+        NTag,
+        {
+          type: row.isCustom ? 'success' : 'default',
+          bordered: false,
+        },
+        { default: () => (row.isCustom ? '是' : '否') }
+      )
     },
   },
   {
@@ -157,5 +177,18 @@ const copyToClipboard = (text: string) => {
   navigator.clipboard.writeText(text).then(() => {
     message.success('短链接已复制到剪贴板')
   })
+}
+
+const getExpirationTagType = (expiresAt: number) => {
+  const now = new Date()
+  const daysUntilExpiration = Math.ceil((expiresAt - now.getTime()) / (1000 * 60 * 60 * 24))
+
+  if (daysUntilExpiration < 0) {
+    return 'error'
+  } else if (daysUntilExpiration <= 3) {
+    return 'warning'
+  } else {
+    return 'default'
+  }
 }
 </script>

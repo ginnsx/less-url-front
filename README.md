@@ -1,39 +1,78 @@
-# less-url-front
+# LessURL - 短链接生成服务
 
-This template should help get you started developing with Vue 3 in Vite.
+LessURL 是一个简单而强大的短接服务，使用 Vue 3 和 Vite 构建。
 
-## Recommended IDE Setup
+## 功能特点
 
-[VSCode](https://code.visualstudio.com/) + [Volar](https://marketplace.visualstudio.com/items?itemName=Vue.volar) (and disable Vetur).
+- 创建短链接
+- 自定义别名
+- 设置链接过期时间
+- 查看链接点击统计
+- 响应式设计，支持移动端和桌面端
+- 深色模式支持
 
-## Type Support for `.vue` Imports in TS
+## 技术栈
 
-TypeScript cannot handle type information for `.vue` imports by default, so we replace the `tsc` CLI with `vue-tsc` for type checking. In editors, we need [Volar](https://marketplace.visualstudio.com/items?itemName=Vue.volar) to make the TypeScript language service aware of `.vue` types.
+- Vue 3
+- TypeScript
+- Vite
+- Pinia (状态管理)
+- Vue Router
+- Naive UI (UI 组件库)
+- Axios (HTTP 客户端)
+- Day.js (日期处理)
 
-## Customize configuration
+## 项目结构
 
-See [Vite Configuration Reference](https://vitejs.dev/config/).
-
-## Project Setup
-
-```sh
-pnpm install
+```plain
+less-url-front/
+├── public/
+├── src/
+│   ├── assets/
+│   ├── components/
+│   ├── plugins/
+│   ├── router/
+│   ├── services/
+│   ├── stores/
+│   ├── views/
+│   ├── App.vue
+│   └── main.ts
+├── mocks/
+├── .eslintrc.cjs
+├── .prettierrc.json
+├── index.html
+├── package.json
+├── README.md
+├── tsconfig.json
+└── vite.config.ts
 ```
 
-### Compile and Hot-Reload for Development
+## 安装和运行
 
-```sh
-pnpm dev
-```
+1. 克隆仓库
 
-### Type-Check, Compile and Minify for Production
+2. 安装依赖：
 
-```sh
-pnpm build
-```
+   ```bash
+   npm install
+   ```
 
-### Lint with [ESLint](https://eslint.org/)
+3. 运行开发服务器：
 
-```sh
-pnpm lint
-```
+   ```bash
+   npm run dev
+   ```
+
+4. 构建生产版本：
+
+   ```bash
+   npm run build
+   ```
+
+## 贡献
+
+欢迎提交 Pull Requests 来改进这个项目。在提交之前，请确保遵循现有的代码风格并通过所有的测试。
+
+## 许可证
+
+[MIT](LICENSE)

@@ -12,8 +12,7 @@ interface Link {
   expiresAt: number
 }
 
-export type { Link }
-export const useLinksStore = defineStore('links', {
+const useLinksStore = defineStore('links', {
   state: () => ({
     links: [] as Link[],
     currentLink: null as Link | null,
@@ -47,3 +46,5 @@ export const useLinksStore = defineStore('links', {
     },
   },
 })
+
+export { type Link, useLinksStore }
