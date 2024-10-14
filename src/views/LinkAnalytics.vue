@@ -55,7 +55,7 @@ import {
 // import ClicksChart from "@/components/ClicksChart.vue";
 // import GeoDistribution from "@/components/GeoDistribution.vue";
 // import DeviceTypes from "@/components/DeviceTypes.vue";
-import dayjs from 'dayjs'
+import { formatDateTime } from '@/utils/dateUtils'
 
 const route = useRoute()
 const linksStore = useLinksStore()
@@ -63,7 +63,7 @@ const linksStore = useLinksStore()
 const currentLink = computed(() => linksStore.currentLink)
 
 const formatDate = (date: number | undefined) => {
-  return date ? dayjs(date).format('YYYY-MM-DD HH:mm') : '-'
+  return date ? formatDateTime(date) : '-'
 }
 
 onMounted(async () => {

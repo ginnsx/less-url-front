@@ -94,6 +94,7 @@
     "useNotification": true,
     "osThemeRef": true,
     "useThemesStore": true,
-    "Link": true
+    "Link": true,
+    "useAuthStore": true
   }
 }

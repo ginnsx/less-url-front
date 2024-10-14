@@ -129,9 +129,9 @@ import {
   NGridItem,
   NText,
 } from 'naive-ui'
-import dayjs from 'dayjs'
 import { useMessage } from 'naive-ui'
 import QRCode from './QRCode.vue'
+import { formatDateTime as formatDate, getExpirationTagType } from '@/utils/dateUtils'
 
 const linksStore = useLinksStore()
 const displayCount = ref(5)
@@ -152,8 +152,6 @@ const loadMore = () => {
   displayCount.value += 5
 }
 
-const formatDate = (date: number) => dayjs(date).format('YYYY-MM-DD HH:mm')
-
 const toggleExpand = (link: { id: string }) => {
   const index = expandedLinks.value.indexOf(link.id)
   if (index === -1) {
@@ -173,19 +171,6 @@ const copyToClipboard = (text: string) => {
 
 const goToAnalytics = (linkId: string) => {
   router.push({ path: `/analytics/${linkId}` })
-}
-
-const getExpirationTagType = (expiresAt: number) => {
-  const now = new Date()
-  const daysUntilExpiration = Math.ceil((expiresAt - now.getTime()) / (1000 * 60 * 60 * 24))
-
-  if (daysUntilExpiration < 0) {
-    return 'error'
-  } else if (daysUntilExpiration <= 3) {
-    return 'warning'
-  } else {
-    return 'success'
-  }
 }
 </script>
 

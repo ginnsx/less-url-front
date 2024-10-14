@@ -20,6 +20,7 @@
     "dayjs": "^1.11.13",
     "grapheme-splitter": "^1.0.4",
     "pinia": "^2.1.7",
+    "pinia-plugin-persistedstate": "^4.1.1",
     "vfonts": "^0.0.3",
     "vue": "^3.4.29",
     "vue-router": "^4.3.3"

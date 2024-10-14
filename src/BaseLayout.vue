@@ -10,8 +10,7 @@
           <n-button text @click="themesStore.toggleTheme()" class="theme-toggle">
             <template #icon>
               <n-icon size="22">
-                <sunny-outline v-if="themesStore.isDarkTheme" />
-                <moon-outline v-else />
+                <component :is="themeIcon" />
               </n-icon>
             </template>
           </n-button>
@@ -20,7 +19,7 @@
     </n-layout-header>
     <n-layout-content content-style="padding: 24px; flex: 1;" :native-scrollbar="false">
       <router-view v-slot="{ Component }">
-        <transition name="fade" mode="out-in">
+        <transition name="fade">
           <component :is="Component" />
         </transition>
       </router-view>
@@ -49,6 +48,8 @@ import { SunnyOutline, MoonOutline } from '@vicons/ionicons5'
 import { useThemesStore } from './stores/themes'
 
 const themesStore = useThemesStore()
+
+const themeIcon = computed(() => (themesStore.isDarkTheme ? SunnyOutline : MoonOutline))
 
 const route = useRoute()
 const activeMenu = computed(() => route.name as string)

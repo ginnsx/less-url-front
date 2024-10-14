@@ -1,5 +1,6 @@
 import { defineStore } from 'pinia'
 import { LinkService } from '@/services/linkService'
+import type { QueryParams } from '@/api/axiosWrapper'
 
 interface Link {
   id: string
@@ -18,11 +19,13 @@ const useLinksStore = defineStore('links', {
     currentLink: null as Link | null,
   }),
   actions: {
-    async fetchLinks() {
+    async fetchLinks(params: QueryParams = {}): Promise<Link[]> {
       try {
-        this.links = await LinkService.getLinks()
+        this.links = await LinkService.getLinks(params)
+        return this.links
       } catch (error) {
         console.error('Failed to fetch links:', error)
+        throw error
       }
     },
     async createLink(longUrl: string, customAlias: string | null, expirationTime: number | null) {

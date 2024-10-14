@@ -65,6 +65,7 @@ const stats = computed(() => [
 }
 
 .stat-card {
+  border-radius: 8px;
   height: 100%;
   transition: all 0.3s ease;
 }

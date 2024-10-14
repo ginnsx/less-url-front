@@ -1,14 +1,10 @@
-import axios from 'axios'
 import type { Link } from '@/stores/links'
-
-const api = axios.create({
-  //   baseURL: import.meta.env.VITE_API_BASE_URL,
-  baseURL: '/api/v1',
-})
+import type { QueryParams } from '@/api/axiosWrapper'
+import { api } from '@/api/axiosWrapper'
 
 export const LinkService = {
-  async getLinks(query: string = ''): Promise<Link[]> {
-    const response = await api.get(`/links?${query}`)
+  async getLinks(params: QueryParams = {}): Promise<Link[]> {
+    const response = await api.get(`/links`, { ...params })
     if (response.status === 200) {
       return response.data.data
     } else {

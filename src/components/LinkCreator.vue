@@ -88,6 +88,7 @@
           ghost
           round
           @click.stop="copyToClipboard"
+          style="margin-bottom: 20px"
         >
           <template #icon>
             <n-icon :component="copied ? CheckmarkCircle : Copy" />
