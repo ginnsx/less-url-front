@@ -12,11 +12,11 @@ export const LinkService = {
     }
   },
   async createLink(
-    longUrl: string,
+    originalUrl: string,
     customAlias: string | null,
     expirationTime: number | null
   ): Promise<Link> {
-    const response = await api.post('/links', { longUrl, customAlias, expirationTime })
+    const response = await api.post('/links', { originalUrl, customAlias, expirationTime })
     if (response.status === 200) {
       return response.data.data
     } else {

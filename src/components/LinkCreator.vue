@@ -9,9 +9,9 @@
       require-mark-placement="right-hanging"
       size="large"
     >
-      <n-form-item path="longUrl" label="原始链接">
+      <n-form-item path="originalUrl" label="原始链接">
         <n-input
-          v-model:value="model.longUrl"
+          v-model:value="model.originalUrl"
           size="large"
           round
           show-count
@@ -61,7 +61,7 @@
           <div style="display: flex; justify-content: flex-end">
             <n-button
               class="create-button"
-              :disabled="!model.longUrl"
+              :disabled="!model.originalUrl"
               round
               type="primary"
               @click="handleCreateLink"
@@ -131,13 +131,13 @@ import dayjs from 'dayjs'
 const formRef = ref<FormInst | null>(null)
 
 const model = reactive({
-  longUrl: '',
+  originalUrl: '',
   customAlias: '',
   expirationTime: null as number | null,
 })
 
 const resetForm = () => {
-  model.longUrl = ''
+  model.originalUrl = ''
   model.customAlias = ''
   model.expirationTime = null
 }
@@ -158,7 +158,7 @@ const isValidUrl = (url: string) => {
 }
 
 const rules: FormRules = {
-  longUrl: [
+  originalUrl: [
     {
       validator(_rule: FormItemRule, value: string) {
         if (!isValidUrl(value)) {
@@ -216,7 +216,7 @@ const handleCreateLink = async (e: Event) => {
 
   async function createLink() {
     const newLink = await linksStore.createLink(
-      model.longUrl,
+      model.originalUrl,
       model.customAlias || null,
       model.expirationTime || null
     )

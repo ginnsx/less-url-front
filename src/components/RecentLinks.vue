@@ -12,7 +12,7 @@
           </template>
           <template #description>
             <n-ellipsis style="max-width: 400px">
-              {{ link.longUrl }}
+              {{ link.originalUrl }}
             </n-ellipsis>
           </template>
           <template #footer>
@@ -56,8 +56,11 @@
                       </n-input-group>
                       <n-input-group>
                         <n-input-group-label>原始链接</n-input-group-label>
-                        <n-input :value="link.longUrl" readonly />
-                        <n-button @click.stop="copyToClipboard(link.longUrl)" class="copy-button">
+                        <n-input :value="link.originalUrl" readonly />
+                        <n-button
+                          @click.stop="copyToClipboard(link.originalUrl)"
+                          class="copy-button"
+                        >
                           复制
                         </n-button>
                       </n-input-group>
@@ -140,7 +143,7 @@ const expandedLinks = ref<string[]>([])
 const router = useRouter()
 
 onMounted(async () => {
-  await linksStore.fetchLinks()
+  await fetchLinks()
 })
 
 const displayedLinks = computed(() =>
@@ -162,6 +165,21 @@ const toggleExpand = (link: { id: string }) => {
 }
 
 const message = useMessage()
+
+const fetchLinks = async () => {
+  try {
+    await linksStore.fetchLinks({
+      sort: {
+        updated_at: 'desc',
+      },
+      page: 1,
+      size: 10,
+    })
+  } catch (error) {
+    console.error('Failed to fetch links:', error)
+    message.error('获取链接列表失败，请重试')
+  }
+}
 
 const copyToClipboard = (text: string) => {
   navigator.clipboard.writeText(text).then(() => {

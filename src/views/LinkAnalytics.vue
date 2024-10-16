@@ -13,7 +13,7 @@
         <n-descriptions bordered>
           <n-descriptions-item label="原始链接">
             <n-ellipsis style="max-width: 500px">
-              {{ currentLink?.longUrl }}
+              {{ currentLink?.originalUrl }}
             </n-ellipsis>
           </n-descriptions-item>
           <n-descriptions-item label="总点击次数">

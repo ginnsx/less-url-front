@@ -5,7 +5,7 @@ const links = [
   {
     id: '1',
     shortUrl: 'http://short.url/abc123',
-    longUrl: 'https://example.com/very/long/url/1',
+    originalUrl: 'https://example.com/very/long/url/1',
     clicks: 10,
     isCustom: false,
     createdAt: new Date('2023-04-01T12:00:00Z').getTime(),
@@ -15,7 +15,7 @@ const links = [
   {
     id: '2',
     shortUrl: 'http://short.url/def456',
-    longUrl: 'https://example.com/very/long/url/2',
+    originalUrl: 'https://example.com/very/long/url/2',
     clicks: 5,
     isCustom: false,
     createdAt: new Date('2023-04-02T14:30:00Z').getTime(),
@@ -25,7 +25,7 @@ const links = [
   {
     id: '3',
     shortUrl: 'http://short.url/custom',
-    longUrl: 'https://example.com/very/long/url/3',
+    originalUrl: 'https://example.com/very/long/url/3',
     clicks: 15,
     isCustom: true,
     createdAt: new Date('2023-04-03T09:15:00Z').getTime(),
@@ -85,11 +85,11 @@ export default [
         })
         req.on('end', () => resolve(undefined))
       })
-      const { longUrl, customAlias, expiresAt } = JSON.parse(reqbody)
+      const { originalUrl, customAlias, expiresAt } = JSON.parse(reqbody)
       const newLink = {
         id: String(links.length + 1),
         shortUrl: `http://short.url/${customAlias || Math.random().toString(36).slice(2, 6)}`,
-        longUrl,
+        originalUrl,
         clicks: 0,
         isCustom: !!customAlias,
         createdAt: new Date().getTime(),

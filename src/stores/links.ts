@@ -5,7 +5,7 @@ import type { QueryParams } from '@/api/axiosWrapper'
 interface Link {
   id: string
   shortUrl: string
-  longUrl: string
+  originalUrl: string
   clicks: number
   isCustom: boolean
   createdAt: number
@@ -21,16 +21,20 @@ const useLinksStore = defineStore('links', {
   actions: {
     async fetchLinks(params: QueryParams = {}): Promise<Link[]> {
       try {
-        this.links = await LinkService.getLinks(params)
+        this.links = (await LinkService.getLinks(params)) ?? []
         return this.links
       } catch (error) {
         console.error('Failed to fetch links:', error)
         throw error
       }
     },
-    async createLink(longUrl: string, customAlias: string | null, expirationTime: number | null) {
+    async createLink(
+      originalUrl: string,
+      customAlias: string | null,
+      expirationTime: number | null
+    ) {
       try {
-        const newLink = await LinkService.createLink(longUrl, customAlias, expirationTime)
+        const newLink = await LinkService.createLink(originalUrl, customAlias, expirationTime)
         this.links.push(newLink)
         return newLink
       } catch (error) {

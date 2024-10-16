@@ -79,7 +79,7 @@ const columns = computed<DataTableColumns<Link>>(() => [
   },
   {
     title: '原始链接',
-    key: 'longUrl',
+    key: 'originalUrl',
     ellipsis: {
       tooltip: true,
     },
@@ -264,7 +264,7 @@ const filterOptions: FilterOption[] = [
   },
   {
     label: '原始链接',
-    value: 'longUrl',
+    value: 'originalUrl',
     type: 'string',
   },
   {
@@ -321,28 +321,34 @@ const applyFilters = async (filters: Filter[]) => {
 
     switch (operator) {
       case 'equals':
-        queryKey += 'Eq'
+        queryKey += '_eq'
         break
       case 'notEquals':
-        queryKey += 'Neq'
+        queryKey += '_ne'
         break
       case 'contains':
-        queryKey += 'Contains'
+        queryKey += '_like'
+        break
+      case 'startsWith':
+        queryKey += '_likeLeft'
+        break
+      case 'endsWith':
+        queryKey += '_likeRight'
         break
       case 'notContains':
-        queryKey += 'NotContains'
+        queryKey += '_not_like'
         break
       case 'greaterThan':
-        queryKey += 'Gt'
+        queryKey += '_gt'
         break
       case 'lessThan':
-        queryKey += 'Lt'
+        queryKey += '_lt'
         break
       case 'greaterThanOrEqual':
-        queryKey += 'Gte'
+        queryKey += '_ge'
         break
       case 'lessThanOrEqual':
-        queryKey += 'Lte'
+        queryKey += '_le'
         break
       default:
         console.warn(`Unsupported operator: ${operator}`)
