@@ -1,5 +1,7 @@
 <template>
-  <n-layout content-style="min-height: 100vh; display: flex; flex-direction: column;">
+  <n-layout
+    content-style="min-height: 100vh; max-width: 1200px; display: flex; flex-direction: column; margin: 0 auto;"
+  >
     <n-layout-header bordered class="header">
       <div class="header-content">
         <router-link to="/" class="logo-link">
@@ -17,7 +19,7 @@
         </div>
       </div>
     </n-layout-header>
-    <n-layout-content content-style="padding: 24px; flex: 1;" :native-scrollbar="false">
+    <n-layout-content content-style="padding: 24px 0; flex: 1;" :native-scrollbar="false">
       <router-view v-slot="{ Component }">
         <transition name="fade">
           <component :is="Component" />
@@ -69,9 +71,7 @@ const menuOptions = [
 
 <style scoped>
 .header {
-  padding: 0 24px;
   backdrop-filter: blur(10px);
-  background-color: rgba(255, 255, 255, 0.1);
   height: var(--header-height);
 }
 
@@ -79,8 +79,7 @@ const menuOptions = [
   display: flex;
   justify-content: space-between;
   align-items: center;
-  max-width: 1000px;
-  margin: 0 auto;
+  padding: 0 24px;
 }
 
 .header-right {
@@ -93,7 +92,6 @@ const menuOptions = [
   text-align: center;
   padding: 24px;
   backdrop-filter: blur(10px);
-  background-color: rgba(255, 255, 255, 0.1);
   height: 64px;
 }
 

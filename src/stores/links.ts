@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia'
 import { LinkService } from '@/services/linkService'
-import type { QueryParams } from '@/api/axiosWrapper'
+import type { QueryParams, PaginationResponse } from '@/api/axiosWrapper'
 
 interface Link {
   id: string
@@ -19,23 +19,35 @@ const useLinksStore = defineStore('links', {
     currentLink: null as Link | null,
   }),
   actions: {
-    async fetchLinks(params: QueryParams = {}): Promise<Link[]> {
+    async fetchLinks(params: QueryParams = {}): Promise<PaginationResponse<Link>> {
       try {
-        this.links = (await LinkService.getLinks(params)) ?? []
-        return this.links
+        const response = await LinkService.getLinks(params)
+        this.links = response.records ?? []
+        return response
       } catch (error) {
         console.error('Failed to fetch links:', error)
         throw error
       }
     },
-    async createLink(
-      originalUrl: string,
-      customAlias: string | null,
-      expirationTime: number | null
-    ) {
+    async fetchRecentLinks() {
       try {
-        const newLink = await LinkService.createLink(originalUrl, customAlias, expirationTime)
-        this.links.push(newLink)
+        await this.fetchLinks({
+          page: 1,
+          size: 50,
+          sort: {
+            updated_at: 'desc',
+          },
+        })
+      } catch (error) {
+        console.error('Failed to fetch recent links:', error)
+        throw error
+      }
+    },
+    async createLink(originalUrl: string, customAlias: string | null, expiresAt: number | null) {
+      try {
+        const newLink = await LinkService.createLink(originalUrl, customAlias, expiresAt)
+        this.currentLink = newLink
+        await this.fetchRecentLinks()
         return newLink
       } catch (error) {
         console.error('Failed to create link:', error)

@@ -95,6 +95,8 @@
     "osThemeRef": true,
     "useThemesStore": true,
     "Link": true,
-    "useAuthStore": true
+    "useAuthStore": true,
+    "useGuestStore": true,
+    "setupGuestStore": true
   }
 }

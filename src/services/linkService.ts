@@ -1,12 +1,12 @@
 import type { Link } from '@/stores/links'
-import type { QueryParams } from '@/api/axiosWrapper'
+import type { QueryParams, PaginationResponse } from '@/api/axiosWrapper'
 import { api } from '@/api/axiosWrapper'
 
 export const LinkService = {
-  async getLinks(params: QueryParams = {}): Promise<Link[]> {
+  async getLinks(params: QueryParams = {}): Promise<PaginationResponse<Link>> {
     const response = await api.get(`/links`, { ...params })
     if (response.status === 200) {
-      return response.data.data
+      return response.data
     } else {
       throw new Error('Failed to fetch links')
     }
@@ -14,11 +14,11 @@ export const LinkService = {
   async createLink(
     originalUrl: string,
     customAlias: string | null,
-    expirationTime: number | null
+    expiresAt: number | null
   ): Promise<Link> {
-    const response = await api.post('/links', { originalUrl, customAlias, expirationTime })
+    const response = await api.post('/links', { originalUrl, customAlias, expiresAt })
     if (response.status === 200) {
-      return response.data.data
+      return response.data
     } else {
       throw new Error('Failed to create link')
     }
@@ -26,7 +26,7 @@ export const LinkService = {
   async getLinkDetails(id: string): Promise<Link> {
     const response = await api.get(`/links/${id}`)
     if (response.status === 200) {
-      return response.data.data
+      return response.data
     } else {
       throw new Error('Failed to fetch link details')
     }

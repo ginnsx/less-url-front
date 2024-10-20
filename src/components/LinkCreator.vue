@@ -35,9 +35,9 @@
                 :maxlength="6"
               />
             </n-form-item-gi>
-            <n-form-item-gi path="expirationTime">
+            <n-form-item-gi path="expiresAt">
               <n-date-picker
-                v-model:value="model.expirationTime"
+                v-model:value="model.expiresAt"
                 type="datetime"
                 size="large"
                 clearable
@@ -58,7 +58,7 @@
 
       <n-row :gutter="[0, 24]">
         <n-col :span="24">
-          <div style="display: flex; justify-content: flex-end">
+          <n-flex justify="end">
             <n-button
               class="create-button"
               :disabled="!model.originalUrl"
@@ -69,32 +69,36 @@
             >
               创建短链接
             </n-button>
-          </div>
+          </n-flex>
         </n-col>
       </n-row>
     </n-form>
     <n-result
       v-if="shortUrl"
       status="success"
-      title="短链接已生成"
+      title="您成功创建了一条短链接"
       :description="copied ? '已复制' : '点击下方链接复制'"
       style="padding: 20px"
     >
       <template #footer>
-        <n-button
-          size="large"
-          :type="copied ? 'success' : 'info'"
-          :bordered="false"
-          ghost
-          round
-          @click.stop="copyToClipboard"
-          style="margin-bottom: 20px"
-        >
-          <template #icon>
-            <n-icon :component="copied ? CheckmarkCircle : Copy" />
-          </template>
-          {{ shortUrl }}
-        </n-button>
+        <n-flex justify="center" align="center">
+          <n-icon class="inline" size="20" depth="1" color="#0e7a0d" :component="CheckmarkSharp" />
+          <n-text class="inline" depth="1" strong>
+            {{ shortUrl }}
+          </n-text>
+          <n-tag
+            class="inline copy-btn"
+            :type="copied ? 'success' : 'info'"
+            :bordered="false"
+            ghost
+            size="medium"
+            @click.stop="copyToClipboard"
+          >
+            <template #icon>
+              <n-icon :component="copied ? CheckmarkDoneSharp : CopySharp" />
+            </template>
+          </n-tag>
+        </n-flex>
         <QRCode :value="shortUrl" :size="200" />
       </template>
     </n-result>
@@ -117,6 +121,9 @@ import {
   NGrid,
   NCollapseTransition,
   NIcon,
+  NText,
+  NFlex,
+  NTag,
   useMessage,
   type FormInst,
   type FormRules,
@@ -125,21 +132,23 @@ import {
 import GraphemeSplitter from 'grapheme-splitter'
 import type { ValidateError } from 'async-validator'
 import QRCode from './QRCode.vue'
-import { CheckmarkCircle, Copy } from '@vicons/ionicons5'
+import { CheckmarkDoneSharp, CopySharp, CheckmarkSharp } from '@vicons/ionicons5'
 import dayjs from 'dayjs'
+
+const emit = defineEmits(['create'])
 
 const formRef = ref<FormInst | null>(null)
 
 const model = reactive({
   originalUrl: '',
   customAlias: '',
-  expirationTime: null as number | null,
+  expiresAt: null as number | null,
 })
 
 const resetForm = () => {
   model.originalUrl = ''
   model.customAlias = ''
-  model.expirationTime = null
+  model.expiresAt = null
 }
 
 const showAdvancedSettings = ref(false)
@@ -199,7 +208,8 @@ const handleCreateLink = async (e: Event) => {
     .then(async () => {
       try {
         await createLink()
-        message.success('短链接创建成功')
+        message.success('短链接已生成')
+        emit('create')
       } catch (error) {
         console.warn('Failed to create link:', error)
         message.error('创建短链接失败，请稍后重试')
@@ -218,7 +228,7 @@ const handleCreateLink = async (e: Event) => {
     const newLink = await linksStore.createLink(
       model.originalUrl,
       model.customAlias || null,
-      model.expirationTime || null
+      model.expiresAt || null
     )
     shortUrl.value = newLink.shortUrl
     resetForm()
@@ -232,7 +242,7 @@ const copyToClipboard = () => {
     copied.value = true
     setTimeout(() => {
       copied.value = false
-    }, 15000)
+    }, 5000)
     message.success('短链接已复制到剪贴板')
   })
 }
@@ -282,5 +292,16 @@ const disablePreviousTime = () => {
 
 .advanced-settings {
   animation: fadeIn 0.5s ease-out;
+}
+.inline {
+  margin-left: 0px;
+  margin-right: 0px;
+  padding: 0px;
+}
+.copy-btn {
+  cursor: pointer;
+  background-color: var(--n-color-checkable);
+  padding: 0px;
+  margin: 0px;
 }
 </style>

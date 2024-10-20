@@ -76,6 +76,7 @@ const columns = computed<DataTableColumns<Link>>(() => [
       )
     },
     fixed: 'left',
+    width: 250,
   },
   {
     title: '原始链接',
@@ -90,7 +91,7 @@ const columns = computed<DataTableColumns<Link>>(() => [
     key: 'clicks',
     sorter: true,
     render(row: Link) {
-      return h(NTag, { type: 'info', bordered: false }, { default: () => row.clicks })
+      return h(NTag, { type: 'info', bordered: false }, { default: () => row.clicks || 0 })
     },
   },
   {
@@ -246,11 +247,10 @@ const query = async (
       ...filters,
     }
     const links = await linksStore.fetchLinks(params)
-    pagination.pageCount = Math.ceil(links.length / pageSize)
-    pagination.itemCount = links.length
+    pagination.pageCount = links.pages
+    pagination.itemCount = links.total
   } catch (error) {
     console.error('Failed to fetch links:', error)
-    message.error('获取链接列表失败，请重试')
   } finally {
     loading.value = false
   }

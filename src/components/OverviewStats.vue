@@ -39,13 +39,14 @@ const stats = computed(() => [
   },
   {
     label: '总点击数',
-    value: linksStore.links.reduce((sum, link) => sum + link.clicks, 0),
+    value: linksStore.links.reduce((sum, link) => sum + link.clicks || 0, 0),
     icon: EyeOutline,
   },
   {
     label: '平均点击数',
     value: (
-      linksStore.links.reduce((sum, link) => sum + link.clicks, 0) / linksStore.links.length || 0
+      linksStore.links.reduce((sum, link) => sum + (link.clicks || 0), 0) /
+        linksStore.links.length || 0
     ).toFixed(2),
     icon: TrendingUpOutline,
   },

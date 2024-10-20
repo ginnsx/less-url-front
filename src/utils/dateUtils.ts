@@ -1,6 +1,9 @@
 import dayjs from 'dayjs'
 
 export const getExpirationTagType = (expiresAt: number) => {
+  if (!expiresAt) {
+    return 'default'
+  }
   const now = dayjs()
   const daysUntilExpiration = dayjs(expiresAt).diff(now, 'day')
 

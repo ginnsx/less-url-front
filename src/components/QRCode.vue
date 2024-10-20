@@ -10,7 +10,7 @@ import { NQrCode, NButton, NFlex } from 'naive-ui'
 import { useTemplateRef } from 'vue'
 import type { ComponentPublicInstance } from 'vue'
 
-defineProps<{
+const props = defineProps<{
   value: string
   size?: number
 }>()
@@ -22,7 +22,7 @@ const handleDownloadQRCode = () => {
   if (canvas instanceof HTMLCanvasElement) {
     const url = canvas.toDataURL()
     const a = document.createElement('a')
-    a.download = 'QRCode.png'
+    a.download = `lessurl-QRCode-${new Date().toISOString()}.png`
     a.href = url
     document.body.appendChild(a)
     a.click()

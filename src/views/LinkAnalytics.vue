@@ -7,6 +7,18 @@
           <n-gradient-text :size="24" type="success">
             {{ currentLink?.shortUrl }}
           </n-gradient-text>
+          <n-tag
+            class="inline copy-btn"
+            :type="copied ? 'success' : 'info'"
+            :bordered="false"
+            ghost
+            size="medium"
+            @click.stop="copyToClipboard"
+          >
+            <template #icon>
+              <n-icon :component="copied ? CheckmarkDoneSharp : CopySharp" />
+            </template>
+          </n-tag>
         </n-h2>
       </template>
       <n-flex vertical size="large">
@@ -38,7 +50,7 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, computed } from 'vue'
+import { onMounted, computed, ref } from 'vue'
 import { useRoute } from 'vue-router'
 import { useLinksStore } from '@/stores/links'
 import {
@@ -51,11 +63,15 @@ import {
   NGrid,
   NGi,
   NGradientText,
+  NTag,
+  NIcon,
 } from 'naive-ui'
 // import ClicksChart from "@/components/ClicksChart.vue";
 // import GeoDistribution from "@/components/GeoDistribution.vue";
 // import DeviceTypes from "@/components/DeviceTypes.vue";
 import { formatDateTime } from '@/utils/dateUtils'
+import { CheckmarkDoneSharp, CopySharp } from '@vicons/ionicons5'
+import { useMessage } from 'naive-ui'
 
 const route = useRoute()
 const linksStore = useLinksStore()
@@ -69,11 +85,23 @@ const formatDate = (date: number | undefined) => {
 onMounted(async () => {
   await linksStore.fetchLinkDetails(route.params.id as string)
 })
+
+const copied = ref(false)
+
+const message = useMessage()
+const copyToClipboard = () => {
+  navigator.clipboard.writeText(currentLink.value?.shortUrl!).then(() => {
+    copied.value = true
+    setTimeout(() => {
+      copied.value = false
+    }, 5000)
+    message.success('短链接已复制到剪贴板')
+  })
+}
 </script>
 
 <style scoped>
 .link-analytics {
-  max-width: 1000px;
   margin: 0 auto;
   height: 100%;
   display: flex;
@@ -83,5 +111,12 @@ onMounted(async () => {
 
 .n-card {
   flex-grow: 1;
+}
+
+.copy-btn {
+  cursor: pointer;
+  background-color: var(--n-color-checkable);
+  padding: 0px;
+  margin: 0px 0px 0px 10px;
 }
 </style>

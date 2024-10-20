@@ -3,9 +3,9 @@
     <n-card class="home-card">
       <n-flex vertical size="large">
         <n-h1>
-          <n-text type="primary" class="gradient-text">更短的链接，更准的营销</n-text>
+          <n-text type="primary" class="gradient-text">更短的链接，更大的世界</n-text>
         </n-h1>
-        <n-p>轻松创建短链接，提高您的在线营销效率</n-p>
+        <n-p>一键生成短链接，轻松分享，快速传播</n-p>
         <LinkCreator />
         <n-divider />
         <RecentLinks />
@@ -22,7 +22,6 @@ import RecentLinks from '@/components/RecentLinks.vue'
 
 <style scoped>
 .home {
-  max-width: 1000px;
   margin: 0 auto;
   height: 100%;
   display: flex;

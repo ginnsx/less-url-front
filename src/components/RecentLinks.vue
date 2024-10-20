@@ -1,112 +1,126 @@
 <template>
   <div class="recent-links">
     <n-h3 class="gradient-text">最近创建的链接</n-h3>
-    <n-list v-if="displayedLinks.length" hoverable clickable>
-      <n-list-item v-for="link in displayedLinks" :key="link.id" @click="toggleExpand(link)">
-        <n-thing :content-style="{ margin: '8px 0' }">
-          <template #header>
-            <n-text class="short-url">{{ link.shortUrl }}</n-text>
-          </template>
-          <template #header-extra>
-            <n-tag type="info" size="small"> 点击次数: {{ link.clicks }} </n-tag>
-          </template>
-          <template #description>
-            <n-ellipsis style="max-width: 400px">
-              {{ link.originalUrl }}
-            </n-ellipsis>
-          </template>
-          <template #footer>
-            <n-grid :cols="2" :x-gap="16">
-              <n-grid-item>
-                <n-flex align="center">
-                  <span>过期时间:</span>
-                  <n-tag
-                    :bordered="false"
-                    :type="getExpirationTagType(link.expiresAt)"
-                    size="medium"
-                  >
-                    {{ formatDate(link.expiresAt) }}
-                  </n-tag>
-                </n-flex>
-              </n-grid-item>
-              <n-grid-item>
-                <n-flex align="center">
-                  <span> 创建时间:</span>
-                  <n-tag
-                    :bordered="false"
-                    size="medium"
-                    style="background-color: var(--n-color-checkable)"
-                  >
-                    {{ formatDate(link.createdAt) }}
-                  </n-tag>
-                </n-flex>
-              </n-grid-item>
-            </n-grid>
-            <n-collapse-transition :show="expandedLinks.includes(link.id)">
-              <div class="expanded-content">
-                <n-grid :cols="24" :x-gap="16">
-                  <n-grid-item :span="16">
-                    <n-flex vertical :size="16">
-                      <n-input-group>
-                        <n-input-group-label>短链接</n-input-group-label>
-                        <n-input :value="link.shortUrl" readonly />
-                        <n-button @click.stop="copyToClipboard(link.shortUrl)" class="copy-button">
-                          复制
-                        </n-button>
-                      </n-input-group>
-                      <n-input-group>
-                        <n-input-group-label>原始链接</n-input-group-label>
-                        <n-input :value="link.originalUrl" readonly />
-                        <n-button
-                          @click.stop="copyToClipboard(link.originalUrl)"
-                          class="copy-button"
-                        >
-                          复制
-                        </n-button>
-                      </n-input-group>
-                      <n-flex vertical :size="8">
-                        <n-flex align="center">
-                          <span>更新时间: {{ formatDate(link.updatedAt) }}</span>
-                        </n-flex>
-                        <n-flex align="center">
-                          <span>是否自定义:</span>
-                          <n-tag
-                            :bordered="false"
-                            :type="link.isCustom ? 'success' : 'default'"
-                            :style="{
-                              backgroundColor: link.isCustom ? '' : 'var(--n-color-checkable)',
-                            }"
-                          >
-                            {{ link.isCustom ? '是' : '否' }}
-                          </n-tag>
-                        </n-flex>
-                        <n-flex vertical align="center">
+    <n-infinite-scroll v-if="displayedLinks.length" :distance="10" @load="loadMore">
+      <n-list hoverable clickable>
+        <n-list-item v-for="link in displayedLinks" :key="link.id" @click="toggleExpand(link)">
+          <n-thing :content-style="{ margin: '8px 0' }">
+            <template #header>
+              <n-text class="short-url">{{ link.shortUrl }}</n-text>
+            </template>
+            <template #header-extra>
+              <n-tag type="info" size="small"> 点击次数: {{ link.clicks || 0 }} </n-tag>
+            </template>
+            <template #description>
+              <n-ellipsis style="max-width: 400px">
+                {{ link.originalUrl }}
+              </n-ellipsis>
+            </template>
+            <template #footer>
+              <n-grid :cols="2" :x-gap="16">
+                <n-grid-item>
+                  <n-flex align="center">
+                    <span>过期时间:</span>
+                    <n-tag
+                      :bordered="false"
+                      :type="getExpirationTagType(link.expiresAt)"
+                      size="medium"
+                    >
+                      {{ link.expiresAt ? formatDate(link.expiresAt) : '未设置' }}
+                    </n-tag>
+                  </n-flex>
+                </n-grid-item>
+                <n-grid-item>
+                  <n-flex align="center">
+                    <span> 创建时间:</span>
+                    <n-tag
+                      :bordered="false"
+                      size="medium"
+                      style="background-color: var(--n-color-checkable)"
+                    >
+                      {{ formatDate(link.createdAt) }}
+                    </n-tag>
+                  </n-flex>
+                </n-grid-item>
+              </n-grid>
+              <n-collapse-transition :show="expandedLinks.includes(link.id)">
+                <div class="expanded-content">
+                  <n-grid :cols="24" :x-gap="16">
+                    <n-grid-item :span="16">
+                      <n-flex vertical :size="16">
+                        <n-input-group>
+                          <n-input-group-label>短链接</n-input-group-label>
+                          <n-input :value="link.shortUrl" readonly />
                           <n-button
-                            type="primary"
-                            size="large"
-                            @click.stop="goToAnalytics(link.id)"
-                            class="analytics-button"
+                            @click.stop="copyToClipboard(link.shortUrl)"
+                            class="copy-button"
                           >
-                            查看详细分析
+                            复制
                           </n-button>
+                        </n-input-group>
+                        <n-input-group>
+                          <n-input-group-label>原始链接</n-input-group-label>
+                          <n-input :value="link.originalUrl" readonly />
+                          <n-button
+                            @click.stop="copyToClipboard(link.originalUrl)"
+                            class="copy-button"
+                          >
+                            复制
+                          </n-button>
+                        </n-input-group>
+                        <n-flex vertical :size="8">
+                          <n-flex align="center">
+                            <span>更新时间: {{ formatDate(link.updatedAt) }}</span>
+                          </n-flex>
+                          <n-flex align="center">
+                            <span>是否自定义:</span>
+                            <n-tag
+                              :bordered="false"
+                              :type="link.isCustom ? 'success' : 'default'"
+                              :style="{
+                                backgroundColor: link.isCustom ? '' : 'var(--n-color-checkable)',
+                              }"
+                            >
+                              {{ link.isCustom ? '是' : '否' }}
+                            </n-tag>
+                          </n-flex>
+                          <n-flex vertical align="center">
+                            <n-button
+                              type="primary"
+                              size="large"
+                              @click.stop="goToAnalytics(link.id)"
+                              class="analytics-button"
+                            >
+                              查看详细分析
+                            </n-button>
+                          </n-flex>
                         </n-flex>
                       </n-flex>
-                    </n-flex>
-                  </n-grid-item>
-                  <n-grid-item :span="8">
-                    <n-flex vertical align="center" justify="space-between" style="height: 100%">
-                      <QRCode :value="link.shortUrl" :size="200" />
-                    </n-flex>
-                  </n-grid-item>
-                </n-grid>
-              </div>
-            </n-collapse-transition>
-          </template>
-        </n-thing>
-      </n-list-item>
-    </n-list>
-    <n-empty v-else description="暂无最近创建的链接" />
-    <n-button size="large" v-if="hasMoreLinks" @click="loadMore" block> 加载更多 </n-button>
+                    </n-grid-item>
+                    <n-grid-item :span="8">
+                      <n-flex vertical align="center" justify="space-between" style="height: 100%">
+                        <QRCode :value="link.shortUrl" :size="200" />
+                      </n-flex>
+                    </n-grid-item>
+                  </n-grid>
+                </div>
+              </n-collapse-transition>
+            </template>
+          </n-thing>
+        </n-list-item>
+      </n-list>
+      <n-flex justify="center">
+        <n-spin v-if="loading" size="small" />
+        <div v-if="noMoreLinks" class="text">
+          {{
+            linksStore.links.length >= 50
+              ? '只显示最近 50 条'
+              : `${linksStore.links.length} 条链接，没有更多了`
+          }}
+        </div>
+      </n-flex>
+    </n-infinite-scroll>
+    <n-empty v-else description="最近没有创建链接" />
   </div>
 </template>
 
@@ -131,28 +145,30 @@ import {
   NGrid,
   NGridItem,
   NText,
+  NInfiniteScroll,
+  NSpin,
 } from 'naive-ui'
 import { useMessage } from 'naive-ui'
 import QRCode from './QRCode.vue'
 import { formatDateTime as formatDate, getExpirationTagType } from '@/utils/dateUtils'
 
 const linksStore = useLinksStore()
+
 const displayCount = ref(5)
 const expandedLinks = ref<string[]>([])
+const loading = ref(false)
 
-const router = useRouter()
+const displayedLinks = computed(() => [...linksStore.links].slice(0, displayCount.value))
 
-onMounted(async () => {
-  await fetchLinks()
-})
-
-const displayedLinks = computed(() =>
-  [...linksStore.links].sort((a, b) => b.createdAt - a.createdAt).slice(0, displayCount.value)
-)
-const hasMoreLinks = computed(() => displayCount.value < linksStore.links.length)
+const noMoreLinks = computed(() => displayedLinks.value.length >= linksStore.links.length)
 
 const loadMore = () => {
-  displayCount.value += 5
+  if (loading.value || noMoreLinks.value) return
+  loading.value = true
+  setTimeout(() => {
+    displayCount.value += 5
+    loading.value = false
+  }, 200)
 }
 
 const toggleExpand = (link: { id: string }) => {
@@ -168,24 +184,23 @@ const message = useMessage()
 
 const fetchLinks = async () => {
   try {
-    await linksStore.fetchLinks({
-      sort: {
-        updated_at: 'desc',
-      },
-      page: 1,
-      size: 10,
-    })
+    await linksStore.fetchRecentLinks()
   } catch (error) {
     console.error('Failed to fetch links:', error)
-    message.error('获取链接列表失败，请重试')
   }
 }
+
+onMounted(async () => {
+  await fetchLinks()
+})
 
 const copyToClipboard = (text: string) => {
   navigator.clipboard.writeText(text).then(() => {
     message.success('已复制到剪贴板')
   })
 }
+
+const router = useRouter()
 
 const goToAnalytics = (linkId: string) => {
   router.push({ path: `/analytics/${linkId}` })

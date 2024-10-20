@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia'
-
+import { useGuestStore } from '@/stores/guest'
 // 定义 JWT 令牌对的接口
 export interface TokenPair {
   accessToken: string
@@ -40,6 +40,20 @@ export const useAuthStore = defineStore('auth', {
       this.accessToken = null
       this.refreshToken = null
       this.expiresAt = null
+    },
+    async login(username: string, password: string) {
+      // 执行登录逻辑
+      // ...
+
+      // 登录成功后，清除 guest id
+      const guestStore = useGuestStore()
+      guestStore.clearGuestId()
+    },
+    logout() {
+      this.clearTokenPair()
+      // 登出后，初始化 guest id
+      const guestStore = useGuestStore()
+      guestStore.initGuestId()
     },
   },
   persist: {

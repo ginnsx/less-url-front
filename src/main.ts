@@ -7,14 +7,20 @@ import 'vfonts/FiraCode.css'
 import { setupNaiveDiscreteApi, setupDayjs } from '@/plugins'
 import { setupRouterGuard } from '@/router/guard'
 import piniaPluginPersistedstate from 'pinia-plugin-persistedstate'
+import { setupGuestStore } from '@/stores/guest'
+
 const app = createApp(App)
 
-const pinia = createPinia()
-pinia.use(piniaPluginPersistedstate)
-app.use(pinia)
 setupNaiveDiscreteApi()
 app.use(router)
 setupRouterGuard(router)
 setupDayjs()
+
+const pinia = createPinia()
+pinia.use(piniaPluginPersistedstate)
+app.use(pinia)
+
+// 初始化 guest id
+await setupGuestStore()
 
 app.mount('#app')

@@ -1,11 +1,20 @@
 import axios, { type AxiosInstance, type AxiosRequestConfig, type AxiosResponse } from 'axios'
 import { type TokenPair, useAuthStore } from '@/stores/auth'
+import { useGuestStore } from '@/stores/guest'
 
 // 定义分页参数接口，支持页码分页和游标分页
 interface PaginationParams {
   page?: number
   size?: number
   after?: string | number
+}
+
+interface PaginationResponse<T> {
+  records: T[]
+  total: number
+  pages: number
+  size: number
+  current: number
 }
 
 // 定义排序参数接口
@@ -32,6 +41,7 @@ interface AxiosWrapperRequestConfig extends AxiosRequestConfig {
 
 export type {
   PaginationParams,
+  PaginationResponse,
   SortParams,
   QueryParams,
   AxiosWrapperConfig,
@@ -48,16 +58,28 @@ class AxiosWrapper {
     this.setupInterceptors()
   }
 
+  private async getAuthHeader(): Promise<Record<string, string>> {
+    const authStore = useAuthStore()
+    const guestStore = useGuestStore()
+
+    if (authStore.isAuthenticated) {
+      const token = await this.getValidToken()
+      const headerName = this.config.authorizationHeader || 'Authorization'
+      return token ? { [headerName]: `Bearer ${token}` } : {}
+    } else if (guestStore.isGuest) {
+      return { 'Guest-ID': guestStore.guestId! }
+    }
+    return {}
+  }
+
   // 设置请求和响应拦截器
   private setupInterceptors() {
     // 请求拦截器：添加认证令牌
     this.instance.interceptors.request.use(
       async (config) => {
         if (this.shouldAttachToken(config)) {
-          const token = await this.getValidToken()
-          if (token) {
-            config.headers[this.config.authorizationHeader || 'Authorization'] = `Bearer ${token}`
-          }
+          const authHeader = await this.getAuthHeader()
+          config.headers = config.headers.concat(authHeader)
         }
         return config
       },
@@ -89,11 +111,14 @@ class AxiosWrapper {
   private shouldAttachToken(config: AxiosRequestConfig): boolean {
     const noTokenRequired = config.headers?.['No-Auth'] === 'true'
     const authStore = useAuthStore()
+    const guestStore = useGuestStore()
     const requireAuth = (config as AxiosWrapperRequestConfig).requireAuth
 
-    // 如果明确要求认证，或者用户已登录且没有明确指示不需要token，则附加token
+    console.log('guestId', guestStore.guestId)
+    const isAuthenticated = authStore.isAuthenticated || guestStore.isGuest
+    // 如果明确要求认证，或者用户已登录/是guest且没有明确指示不需要token，则附加token
     return (
-      (requireAuth || (authStore.isAuthenticated && !noTokenRequired)) &&
+      (requireAuth || (isAuthenticated && !noTokenRequired)) &&
       config.url !== this.config.tokenRefreshURL
     )
   }
