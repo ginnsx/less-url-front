@@ -5,7 +5,7 @@
         <n-h1>
           <n-text type="primary" class="gradient-text">更短的链接，更大的世界</n-text>
         </n-h1>
-        <n-p>一键生成短链接，轻松分享，快速传播</n-p>
+        <n-p>一键生成短链接，轻松分享，快速传播，精准分析</n-p>
         <LinkCreator />
         <n-divider />
         <RecentLinks />

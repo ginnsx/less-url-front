@@ -37,6 +37,9 @@ interface AxiosWrapperConfig extends AxiosRequestConfig {
 
 interface AxiosWrapperRequestConfig extends AxiosRequestConfig {
   requireAuth?: boolean
+  requiredGuest?: boolean
+  requiredJWT?: boolean
+  noAuth?: boolean
 }
 
 export type {
@@ -58,16 +61,22 @@ class AxiosWrapper {
     this.setupInterceptors()
   }
 
-  private async getAuthHeader(): Promise<Record<string, string>> {
+  private async getAuthHeader(config: AxiosWrapperRequestConfig): Promise<Record<string, string>> {
     const authStore = useAuthStore()
     const guestStore = useGuestStore()
-
-    if (authStore.isAuthenticated) {
+    if (config.requiredGuest && guestStore.isGuest) {
+      return { 'Guest-ID': guestStore.guestId! }
+    }
+    if (config.requiredJWT || authStore.isAuthenticated) {
       const token = await this.getValidToken()
       const headerName = this.config.authorizationHeader || 'Authorization'
       return token ? { [headerName]: `Bearer ${token}` } : {}
-    } else if (guestStore.isGuest) {
+    }
+    if (guestStore.isGuest) {
       return { 'Guest-ID': guestStore.guestId! }
+    }
+    if (config.noAuth) {
+      return { 'No-Auth': 'true' }
     }
     return {}
   }
@@ -78,7 +87,7 @@ class AxiosWrapper {
     this.instance.interceptors.request.use(
       async (config) => {
         if (this.shouldAttachToken(config)) {
-          const authHeader = await this.getAuthHeader()
+          const authHeader = await this.getAuthHeader(config)
           config.headers = config.headers.concat(authHeader)
         }
         return config
@@ -109,16 +118,15 @@ class AxiosWrapper {
 
   // 判断是否应该附加令牌
   private shouldAttachToken(config: AxiosRequestConfig): boolean {
-    const noTokenRequired = config.headers?.['No-Auth'] === 'true'
     const authStore = useAuthStore()
     const guestStore = useGuestStore()
-    const requireAuth = (config as AxiosWrapperRequestConfig).requireAuth
+    const { requireAuth, requiredGuest, requiredJWT, noAuth } = config as AxiosWrapperRequestConfig
+    const noTokenRequired = noAuth || config.headers?.['No-Auth'] === 'true'
 
-    console.log('guestId', guestStore.guestId)
     const isAuthenticated = authStore.isAuthenticated || guestStore.isGuest
     // 如果明确要求认证，或者用户已登录/是guest且没有明确指示不需要token，则附加token
     return (
-      (requireAuth || (isAuthenticated && !noTokenRequired)) &&
+      (requireAuth || requiredGuest || requiredJWT || (isAuthenticated && !noTokenRequired)) &&
       config.url !== this.config.tokenRefreshURL
     )
   }

@@ -18,7 +18,7 @@
           placeholder="请输入需要缩短的链接"
           :count-graphemes="countGraphemes"
           :maxlength="maxUrlLength"
-          @keydown.enter.prevent
+          @keydown.enter.prevent="handleCreateLink"
         />
       </n-form-item>
 

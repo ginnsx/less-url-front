@@ -8,7 +8,6 @@
           <n-text class="logo-text">LessURL</n-text>
         </router-link>
         <div class="header-right">
-          <n-menu mode="horizontal" :options="menuOptions" :value="activeMenu" />
           <n-button text @click="themesStore.toggleTheme()" class="theme-toggle">
             <template #icon>
               <n-icon size="22">
@@ -16,6 +15,20 @@
               </n-icon>
             </template>
           </n-button>
+          <n-menu mode="horizontal" :options="menuOptions" :value="activeMenu" />
+          <n-dropdown
+            v-if="authStore.isAuthenticated"
+            trigger="hover"
+            :options="userMenuOptions"
+            @select="handleUserMenuSelect"
+          >
+            <n-space vertical item-style="line-height: 0;">
+              <n-avatar round size="large" :color="avatarColor" class="avatar-animated">
+                {{ avatarText }}
+              </n-avatar>
+            </n-space>
+          </n-dropdown>
+          <n-button v-else text @click="goToAuth">登录</n-button>
         </div>
       </div>
     </n-layout-header>
@@ -33,8 +46,8 @@
 </template>
 
 <script setup lang="ts">
-import { h, computed } from 'vue'
-import { useRoute } from 'vue-router'
+import { h, computed, type Component } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
 import {
   NLayout,
   NLayoutHeader,
@@ -44,12 +57,27 @@ import {
   NText,
   NButton,
   NIcon,
+  NAvatar,
+  NDropdown,
+  NSpace,
+  useDialog,
+  useMessage,
 } from 'naive-ui'
 import { RouterLink } from 'vue-router'
 import { SunnyOutline, MoonOutline } from '@vicons/ionicons5'
 import { useThemesStore } from './stores/themes'
+import { useAuthStore } from './stores/auth'
+import {
+  Pencil as EditIcon,
+  LogOutOutline as LogoutIcon,
+  PersonCircleOutline as UserIcon,
+} from '@vicons/ionicons5'
 
 const themesStore = useThemesStore()
+const authStore = useAuthStore()
+const router = useRouter()
+const dialog = useDialog()
+const message = useMessage()
 
 const themeIcon = computed(() => (themesStore.isDarkTheme ? SunnyOutline : MoonOutline))
 
@@ -59,20 +87,92 @@ const activeMenu = computed(() => route.name as string)
 // 定义导航菜单
 const menuOptions = [
   {
-    label: () => h(RouterLink, { to: '/' }, { default: () => 'Home' }),
-    key: 'home',
+    label: () => h(RouterLink, { to: '/' }, { default: () => '首页' }),
+    key: '首页',
   },
   {
-    label: () => h(RouterLink, { to: '/dashboard' }, { default: () => 'Dashboard' }),
-    key: 'dashboard',
+    label: () => h(RouterLink, { to: '/dashboard' }, { default: () => '仪表盘' }),
+    key: '仪表盘',
   },
 ]
+
+const avatarText = computed(() => {
+  const username = authStore.username
+  return username ? username.charAt(0).toUpperCase() : '?'
+})
+
+const avatarColor = computed(() => {
+  const colors = [
+    '#36ad6a', // 主题色的稍亮变体
+    '#0c7a43', // 主题色的稍暗变体
+    '#63d693', // 主题色的柔和变体
+    '#14915b', // 主题色的稍深变体
+  ]
+  const index = authStore.username.length % colors.length
+  return colors[index]
+})
+
+const userMenuOptions = [
+  {
+    label: '用户资料',
+    key: 'profile',
+    icon: renderIcon(UserIcon),
+  },
+  {
+    label: '编辑用户资料',
+    key: 'editProfile',
+    icon: renderIcon(EditIcon),
+  },
+  {
+    label: '退出登录',
+    key: 'logout',
+    icon: renderIcon(LogoutIcon),
+  },
+]
+
+const handleUserMenuSelect = (key: string) => {
+  if (key === 'logout') {
+    showLogoutConfirmation()
+  }
+}
+
+const showLogoutConfirmation = () => {
+  dialog.warning({
+    title: '确认退出',
+    content: '您确定要退出登录吗？',
+    positiveText: '确定',
+    negativeText: '取消',
+    onPositiveClick: () => {
+      handleLogout()
+    },
+    onNegativeClick: () => {
+      // Do nothing, just close the dialog
+    },
+  })
+}
+
+const goToAuth = () => {
+  router.push('/auth')
+}
+
+const handleLogout = () => {
+  authStore.logout()
+  router.push('/')
+  message.success('您已成功退出登录')
+}
+
+function renderIcon(icon: Component) {
+  return () => {
+    return h(NIcon, null, {
+      default: () => h(icon),
+    })
+  }
+}
 </script>
 
 <style scoped>
 .header {
   backdrop-filter: blur(10px);
-  height: var(--header-height);
 }
 
 .header-content {
@@ -92,7 +192,6 @@ const menuOptions = [
   text-align: center;
   padding: 24px;
   backdrop-filter: blur(10px);
-  height: 64px;
 }
 
 .logo-link {
@@ -139,5 +238,24 @@ const menuOptions = [
 :deep(.n-menu.n-menu--horizontal .n-menu-item-content.n-menu-item-content--selected) {
   font-weight: bold;
   color: #fff;
+}
+
+.avatar-animated {
+  transition: all 0.3s ease;
+  cursor: pointer;
+}
+
+.avatar-animated:hover {
+  transform: scale(1.1);
+  box-shadow: 0 0 10px rgba(24, 160, 88, 0.5); /* 使用主题色的阴影 */
+}
+
+.avatar-animated:active {
+  transform: scale(0.95);
+}
+
+/* 为下拉菜单添加过渡效果 */
+:deep(.n-dropdown-menu) {
+  transition: all 0.3s ease;
 }
 </style>

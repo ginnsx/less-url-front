@@ -43,6 +43,26 @@ const themesStore = useThemesStore()
   opacity: 0;
 }
 
+/* 自动填充样式 */
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus,
+input:-webkit-autofill:active,
+textarea:-webkit-autofill,
+textarea:-webkit-autofill:hover,
+textarea:-webkit-autofill:focus,
+textarea:-webkit-autofill:active,
+select:-webkit-autofill,
+select:-webkit-autofill:hover,
+select:-webkit-autofill:focus,
+select:-webkit-autofill:active {
+  -webkit-background-clip: text;
+  -webkit-box-shadow: 0 0 0 1000px transparent inset !important;
+  -webkit-text-fill-color: var(--n-text-color) !important;
+  transition: background-color 5000s ease-in-out 0s;
+  background-color: var(--n-color) !important;
+}
+
 @keyframes slideIn {
   from {
     opacity: 0;
