@@ -5,7 +5,9 @@
     <n-layout-header bordered class="header">
       <div class="header-content">
         <router-link to="/" class="logo-link">
-          <n-text class="logo-text">LessURL</n-text>
+          <n-text @mouseover="hover = true" @mouseout="hover = false" class="logo-text">
+            {{ logoText }}
+          </n-text>
         </router-link>
         <div class="header-right">
           <n-button text @click="themesStore.toggleTheme()" class="theme-toggle">
@@ -32,7 +34,10 @@
         </div>
       </div>
     </n-layout-header>
-    <n-layout-content content-style="padding: 24px 0; flex: 1;" :native-scrollbar="false">
+    <n-layout-content
+      content-style="padding: 24px 0; flex: 1; display: flex; flex-direction: column;"
+      :native-scrollbar="false"
+    >
       <router-view v-slot="{ Component }">
         <transition name="fade">
           <component :is="Component" />
@@ -46,7 +51,7 @@
 </template>
 
 <script setup lang="ts">
-import { h, computed, type Component } from 'vue'
+import { h, computed, type Component, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import {
   NLayout,
@@ -78,7 +83,9 @@ const authStore = useAuthStore()
 const router = useRouter()
 const dialog = useDialog()
 const message = useMessage()
+const hover = ref(false)
 
+const logoText = computed(() => (hover.value ? 'LëssURL' : 'LessURL'))
 const themeIcon = computed(() => (themesStore.isDarkTheme ? SunnyOutline : MoonOutline))
 
 const route = useRoute()
@@ -88,11 +95,11 @@ const activeMenu = computed(() => route.name as string)
 const menuOptions = [
   {
     label: () => h(RouterLink, { to: '/' }, { default: () => '首页' }),
-    key: '首页',
+    key: 'Home',
   },
   {
-    label: () => h(RouterLink, { to: '/dashboard' }, { default: () => '仪表盘' }),
-    key: '仪表盘',
+    label: () => h(RouterLink, { to: '/dashboard' }, { default: () => '控制台' }),
+    key: 'Dashboard',
   },
 ]
 
@@ -103,10 +110,10 @@ const avatarText = computed(() => {
 
 const avatarColor = computed(() => {
   const colors = [
-    '#36ad6a', // 主题色的稍亮变体
-    '#0c7a43', // 主题色的稍暗变体
-    '#63d693', // 主题色的柔和变体
-    '#14915b', // 主题色的稍深变体
+    '#a0a0a0', // 中性灰色
+    '#808080', // 深灰色
+    '#c0c0c0', // 浅灰色
+    '#696969', // 暗灰色
   ]
   const index = authStore.username.length % colors.length
   return colors[index]

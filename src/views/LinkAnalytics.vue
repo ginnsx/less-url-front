@@ -3,10 +3,10 @@
     <n-card>
       <template #header>
         <n-h2>
-          <span>链接分析: </span>
-          <n-gradient-text :size="24" type="success">
+          <!-- <span>链接分析: </span> -->
+          <n-text type="default">
             {{ currentLink?.shortUrl }}
-          </n-gradient-text>
+          </n-text>
           <n-tag
             class="inline copy-btn"
             :type="copied ? 'success' : 'info'"
@@ -62,7 +62,7 @@ import {
   NEllipsis,
   NGrid,
   NGi,
-  NGradientText,
+  NText,
   NTag,
   NIcon,
 } from 'naive-ui'
@@ -102,10 +102,6 @@ const copyToClipboard = () => {
 
 <style scoped>
 .link-analytics {
-  margin: 0 auto;
-  height: 100%;
-  display: flex;
-  flex-direction: column;
   animation: fadeIn 0.5s ease-out;
 }
 

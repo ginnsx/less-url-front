@@ -17,6 +17,15 @@ const routes: Array<RouteRecordRaw> = [
     name: 'auth',
     component: () => import('@/views/AuthView.vue'),
   },
+  {
+    path: '/404',
+    name: 'notFound',
+    component: () => import('@/views/404View.vue'),
+  },
+  {
+    path: '/:pathMatch(.*)*',
+    redirect: '/404',
+  },
 ]
 
 const router = createRouter({

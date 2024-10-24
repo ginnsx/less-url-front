@@ -105,7 +105,7 @@ const columns = computed<DataTableColumns<Link>>(() => [
           bordered: false,
           type: getExpirationTagType(row.expiresAt),
         },
-        { default: () => formatDateTime(row.expiresAt) }
+        { default: () => (row.expiresAt ? formatDateTime(row.expiresAt) : '未设置') }
       )
     },
   },
@@ -128,7 +128,7 @@ const columns = computed<DataTableColumns<Link>>(() => [
     key: 'createdAt',
     sorter: true,
     render(row: Link) {
-      return formatDateTime(row.createdAt)
+      return row.createdAt ? formatDateTime(row.createdAt) : '--'
     },
   },
   {
@@ -136,7 +136,7 @@ const columns = computed<DataTableColumns<Link>>(() => [
     key: 'updatedAt',
     sorter: true,
     render(row: Link) {
-      return formatDateTime(row.updatedAt)
+      return row.updatedAt ? formatDateTime(row.updatedAt) : '--'
     },
   },
   {

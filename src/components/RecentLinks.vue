@@ -111,13 +111,13 @@
       </n-list>
       <n-flex justify="center">
         <n-spin v-if="loading" size="small" />
-        <div v-if="noMoreLinks" class="text">
+        <n-text v-if="noMoreLinks" depth="3">
           {{
             linksStore.links.length >= 50
               ? '只显示最近 50 条'
               : `${linksStore.links.length} 条链接，没有更多了`
           }}
-        </div>
+        </n-text>
       </n-flex>
     </n-infinite-scroll>
     <n-empty v-else description="最近没有创建链接" />

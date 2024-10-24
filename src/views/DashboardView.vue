@@ -2,7 +2,7 @@
   <div class="dashboard">
     <n-card>
       <template #header>
-        <n-h1 class="gradient-text">仪表板</n-h1>
+        <n-h1 class="gradient-text">控制台</n-h1>
       </template>
       <n-flex vertical size="large">
         <OverviewStats />
@@ -20,10 +20,6 @@ import LinkList from '@/components/LinkList.vue'
 
 <style scoped>
 .dashboard {
-  margin: 0 auto;
-  height: 100%;
-  display: flex;
-  flex-direction: column;
   animation: fadeIn 0.5s ease-out;
 }
 
