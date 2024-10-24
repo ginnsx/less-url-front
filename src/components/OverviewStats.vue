@@ -21,41 +21,60 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue'
+import { computed, reactive, onMounted, ref } from 'vue'
 import { useLinksStore } from '@/stores/links'
 import { NGrid, NGi, NStatistic, NIcon, NText, NCard, NNumberAnimation } from 'naive-ui'
 import { LinkOutline, EyeOutline, TrendingUpOutline, CalendarOutline } from '@vicons/ionicons5'
 import dayjs from 'dayjs'
+import { type LinkDataCounts, type Link } from '@/stores/links'
+import { LinkService } from '@/services/linkService'
 
 const linksStore = useLinksStore()
 
 const iconColor = '#00b09b'
+const counts = reactive<LinkDataCounts>({
+  links: 0,
+  analytics: 0,
+})
+
+const latestLink = ref<Link | null>(null)
+
+onMounted(async () => {
+  const data = await linksStore.countLinks()
+  counts.links = data.links
+  counts.analytics = data.analytics
+})
+
+onMounted(async () => {
+  const data = await LinkService.getLinks({
+    page: 1,
+    size: 1,
+    sort: { created_at: 'desc' },
+  })
+  latestLink.value = data.records[0]
+})
 
 const stats = computed(() => [
   {
     label: '总链接数',
-    value: linksStore.links.length,
+    value: counts.links,
     icon: LinkOutline,
   },
   {
     label: '总点击数',
-    value: linksStore.links.reduce((sum, link) => sum + link.clicks || 0, 0),
+    value: counts.analytics,
     icon: EyeOutline,
   },
   {
     label: '平均点击数',
-    value: (
-      linksStore.links.reduce((sum, link) => sum + (link.clicks || 0), 0) /
-        linksStore.links.length || 0
-    ).toFixed(2),
+    value: counts.links > 0 ? (counts.analytics / counts.links).toFixed(2) : 0,
     icon: TrendingUpOutline,
   },
   {
     label: '最近创建',
-    value:
-      linksStore.links.length > 0
-        ? dayjs(Math.max(...linksStore.links.map((l) => l.createdAt))).format('YYYY-MM-DD')
-        : '-',
+    value: latestLink.value?.createdAt
+      ? dayjs(latestLink.value?.createdAt).format('YYYY-MM-DD')
+      : '-',
     icon: CalendarOutline,
   },
 ])

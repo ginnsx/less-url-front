@@ -61,26 +61,6 @@ class AxiosWrapper {
     this.setupInterceptors()
   }
 
-  private async getAuthHeader(config: AxiosWrapperRequestConfig): Promise<Record<string, string>> {
-    const authStore = useAuthStore()
-    const guestStore = useGuestStore()
-    if (config.requiredGuest && guestStore.isGuest) {
-      return { 'Guest-ID': guestStore.guestId! }
-    }
-    if (config.requiredJWT || authStore.isAuthenticated) {
-      const token = await this.getValidToken()
-      const headerName = this.config.authorizationHeader || 'Authorization'
-      return token ? { [headerName]: `Bearer ${token}` } : {}
-    }
-    if (guestStore.isGuest) {
-      return { 'Guest-ID': guestStore.guestId! }
-    }
-    if (config.noAuth) {
-      return { 'No-Auth': 'true' }
-    }
-    return {}
-  }
-
   // 设置请求和响应拦截器
   private setupInterceptors() {
     // 请求拦截器：添加认证令牌
@@ -131,6 +111,31 @@ class AxiosWrapper {
     )
   }
 
+  private async getAuthHeader(config: AxiosWrapperRequestConfig): Promise<Record<string, string>> {
+    if (config.noAuth) {
+      return { 'No-Auth': 'true' }
+    }
+    const guestStore = useGuestStore()
+    if (config.requiredGuest && guestStore.isGuest) {
+      return { 'Guest-ID': guestStore.guestId! }
+    }
+    const headerName = this.config.authorizationHeader || 'Authorization'
+    if (config.requiredJWT) {
+      const token = await this.getValidToken()
+      return token ? { [headerName]: `Bearer ${token}` } : {}
+    }
+
+    const token = await this.getValidToken()
+    if (token) {
+      return { [headerName]: `Bearer ${token}` }
+    }
+    if (guestStore.isGuest) {
+      return { 'Guest-ID': guestStore.guestId! }
+    }
+
+    return {}
+  }
+
   // 获取有效的访问令牌
   private async getValidToken(): Promise<string | null> {
     const authStore = useAuthStore()
@@ -166,7 +171,7 @@ class AxiosWrapper {
   private async refreshTokenIfNeeded() {
     const authStore = useAuthStore()
 
-    if (authStore.isAuthenticated && authStore.isTokenExpiringSoon) {
+    if (authStore.isTokenExpiringSoon) {
       await this.refreshToken()
     }
   }

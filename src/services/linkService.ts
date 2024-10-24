@@ -1,4 +1,4 @@
-import type { Link } from '@/stores/links'
+import type { Link, LinkDataCounts } from '@/stores/links'
 import type { QueryParams, PaginationResponse } from '@/api/axiosWrapper'
 import { api } from '@/api/axiosWrapper'
 
@@ -30,5 +30,19 @@ export const LinkService = {
     } else {
       throw new Error('Failed to fetch link details')
     }
+  },
+  async countLinks({
+    requiredGuest = false,
+    requiredJWT = false,
+  }: {
+    requiredGuest?: boolean
+    requiredJWT?: boolean
+  }): Promise<LinkDataCounts> {
+    const { data } = await api.get<LinkDataCounts>(
+      '/links/counts',
+      {},
+      { requiredGuest, requiredJWT }
+    )
+    return data
   },
 }

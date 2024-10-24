@@ -1,6 +1,7 @@
 import { defineStore } from 'pinia'
 import { api } from '@/api/axiosWrapper'
 import { useGuestStore } from '@/stores/guest'
+import { useLinksStore } from '@/stores/links'
 
 // 定义 JWT 令牌对的接口
 export interface TokenPair {
@@ -15,7 +16,7 @@ interface AuthResponse {
   expires_in: number
 }
 
-interface GuestCounts {
+interface LinkDataCounts {
   links: number
   analytics: number
 }
@@ -48,7 +49,11 @@ export const useAuthStore = defineStore('auth', {
     },
     isTokenExpiringSoon: (state) => {
       const expirationThreshold = 5 * 60 * 1000 // 5 minutes
-      return state.expiresIn != null && state.expiresIn - Date.now() < expirationThreshold
+      return (
+        !!state.accessToken &&
+        state.expiresIn != null &&
+        state.expiresIn - Date.now() < expirationThreshold
+      )
     },
     username: (state) => state.user?.nickname || '',
   },
@@ -152,7 +157,7 @@ export const useAuthStore = defineStore('auth', {
       guestStore.initGuestId()
     },
     async migrate(guestId: string) {
-      async function showMigrationConfirmation(counts: GuestCounts): Promise<boolean> {
+      async function showMigrationConfirmation(counts: LinkDataCounts): Promise<boolean> {
         return new Promise((resolve) => {
           window['$dialog'].info({
             title: '合并本地数据',
@@ -167,8 +172,9 @@ export const useAuthStore = defineStore('auth', {
         })
       }
 
+      const linkStore = useLinksStore()
       try {
-        const { data } = await api.get<GuestCounts>('/guest/counts', {}, { requiredGuest: true })
+        const data = await linkStore.countLinks({ requiredGuest: true })
         if (data.links > 0) {
           const shouldMigrate = await showMigrationConfirmation(data)
           if (shouldMigrate) {
@@ -183,7 +189,7 @@ export const useAuthStore = defineStore('auth', {
 
     async migrateGuestData(guestId: string) {
       try {
-        const { data } = await api.post<GuestCounts>('/users/migrate', { guestId })
+        const { data } = await api.post<LinkDataCounts>('/users/migrate', { guestId })
         window['$notification'].success({
           title: '合并本地数据',
           content: `成功合并 ${data.links} 条链接记录和 ${data.analytics} 条分析记录`,

@@ -13,6 +13,11 @@ interface Link {
   expiresAt: number
 }
 
+interface LinkDataCounts {
+  links: number
+  analytics: number
+}
+
 const useLinksStore = defineStore('links', {
   state: () => ({
     links: [] as Link[],
@@ -35,7 +40,7 @@ const useLinksStore = defineStore('links', {
           page: 1,
           size: 50,
           sort: {
-            updated_at: 'desc',
+            created_at: 'desc',
           },
         })
       } catch (error) {
@@ -63,7 +68,21 @@ const useLinksStore = defineStore('links', {
         throw error
       }
     },
+    async countLinks({
+      requiredGuest = false,
+      requiredJWT = false,
+    }: {
+      requiredGuest?: boolean
+      requiredJWT?: boolean
+    } = {}) {
+      try {
+        return await LinkService.countLinks({ requiredGuest, requiredJWT })
+      } catch (error) {
+        console.error('Failed to count links:', error)
+        throw error
+      }
+    },
   },
 })
 
-export { type Link, useLinksStore }
+export { type Link, type LinkDataCounts, useLinksStore }
