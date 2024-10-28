@@ -120,7 +120,7 @@ import {
 import type { FormInst, FormRules } from 'naive-ui'
 import { useAuthStore } from '@/stores/auth'
 
-const emit = defineEmits(['register-success'])
+const emit = defineEmits(['register-success', 'login-success'])
 
 const formRef = ref<FormInst | null>(null)
 const message = useMessage()
@@ -353,11 +353,15 @@ const handleSubmit = (e: MouseEvent | KeyboardEvent) => {
           model.verifyCode
         )
         if (success) {
-          message.success('注册成功并已登录')
           emit('register-success')
+          await authStore.login(model.email, model.password)
+          message.success('注册成功并已登录')
+          emit('login-success')
         } else {
           message.error('注册失败，请稍后重试')
         }
+      } catch (error) {
+        console.error('Register failed:', error)
       } finally {
         isLoading.value = false
       }

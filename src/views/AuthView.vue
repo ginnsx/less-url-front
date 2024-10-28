@@ -12,7 +12,7 @@
           <login-form @login-success="handleLoginSuccess" />
         </n-tab-pane>
         <n-tab-pane name="register" tab="注册">
-          <register-form @register-success="handleRegisterSuccess" />
+          <register-form @login-success="handleLoginSuccess" />
         </n-tab-pane>
       </n-tabs>
     </n-card>
@@ -22,19 +22,21 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import { NCard, NTabs, NTabPane } from 'naive-ui'
-import { useRouter } from 'vue-router'
+import { useRouter, useRoute } from 'vue-router'
 import LoginForm from '@/components/LoginForm.vue'
 import RegisterForm from '@/components/RegisterForm.vue'
 
 const activeTab = ref('login')
 const router = useRouter()
+const route = useRoute()
 
 const handleLoginSuccess = () => {
-  router.push('/')
-}
-
-const handleRegisterSuccess = () => {
-  router.push('/')
+  try {
+    const redirectPath = (route.query.redirect as string) || '/'
+    router.push(redirectPath)
+  } catch (error) {
+    console.error('登录失败:', error)
+  }
 }
 </script>
 

@@ -11,6 +11,9 @@ const routes: Array<RouteRecordRaw> = [
     path: '/analytics/:id',
     component: () => import('@/views/LinkAnalytics.vue'),
     name: 'analytics',
+    meta: {
+      requiresAuth: true,
+    },
   },
   {
     path: '/auth',

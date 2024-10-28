@@ -82,6 +82,10 @@ const useLinksStore = defineStore('links', {
         throw error
       }
     },
+    clearLinks() {
+      this.links = []
+      this.currentLink = null
+    },
   },
 })
 

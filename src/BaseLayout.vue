@@ -72,6 +72,7 @@ import { RouterLink } from 'vue-router'
 import { SunnyOutline, MoonOutline } from '@vicons/ionicons5'
 import { useThemesStore } from './stores/themes'
 import { useAuthStore } from './stores/auth'
+import { useLinksStore } from './stores/links'
 import {
   Pencil as EditIcon,
   LogOutOutline as LogoutIcon,
@@ -80,6 +81,7 @@ import {
 
 const themesStore = useThemesStore()
 const authStore = useAuthStore()
+const linksStore = useLinksStore()
 const router = useRouter()
 const dialog = useDialog()
 const message = useMessage()
@@ -164,6 +166,7 @@ const goToAuth = () => {
 
 const handleLogout = () => {
   authStore.logout()
+  linksStore.clearLinks()
   router.push('/')
   message.success('您已成功退出登录')
 }

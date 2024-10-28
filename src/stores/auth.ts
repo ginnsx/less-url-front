@@ -121,7 +121,7 @@ export const useAuthStore = defineStore('auth', {
           password,
           verifyCode,
         })
-        return await this.login(email, password)
+        return true
       } catch (error) {
         console.error('Registration failed:', error)
         return false
