@@ -142,6 +142,8 @@ const userMenuOptions = [
 const handleUserMenuSelect = (key: string) => {
   if (key === 'logout') {
     showLogoutConfirmation()
+  } else {
+    message.info(`你点击了 ${key}`)
   }
 }
 

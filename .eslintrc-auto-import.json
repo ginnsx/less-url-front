@@ -97,6 +97,7 @@
     "Link": true,
     "useAuthStore": true,
     "useGuestStore": true,
-    "setupGuestStore": true
+    "setupGuestStore": true,
+    "useAnalysisStore": true
   }
 }

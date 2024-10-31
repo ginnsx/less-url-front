@@ -6,7 +6,7 @@ interface Link {
   id: string
   shortUrl: string
   originalUrl: string
-  clicks: number
+  visits: number
   isCustom: boolean
   createdAt: number
   updatedAt: number

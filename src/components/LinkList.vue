@@ -87,11 +87,11 @@ const columns = computed<DataTableColumns<Link>>(() => [
     width: 400,
   },
   {
-    title: '点击次数',
-    key: 'clicks',
+    title: '访问次数',
+    key: 'visits',
     sorter: true,
     render(row: Link) {
-      return h(NTag, { type: 'info', bordered: false }, { default: () => row.clicks || 0 })
+      return h(NTag, { type: 'info', bordered: false }, { default: () => row.visits || 0 })
     },
   },
   {
@@ -268,8 +268,8 @@ const filterOptions: FilterOption[] = [
     type: 'string',
   },
   {
-    label: '点击次数',
-    value: 'clicks',
+    label: '访问次数',
+    value: 'visits',
     type: 'number',
   },
   {

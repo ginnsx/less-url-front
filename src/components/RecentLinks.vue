@@ -9,7 +9,7 @@
               <n-text class="short-url">{{ link.shortUrl }}</n-text>
             </template>
             <template #header-extra>
-              <n-tag type="info" size="small"> 点击次数: {{ link.clicks || 0 }} </n-tag>
+              <n-tag type="info" size="small"> 访问次数: {{ link.visits || 0 }} </n-tag>
             </template>
             <template #description>
               <n-ellipsis style="max-width: 400px">
