@@ -10,7 +10,7 @@ import { NQrCode, NButton, NFlex } from 'naive-ui'
 import { useTemplateRef } from 'vue'
 import type { ComponentPublicInstance } from 'vue'
 
-const props = defineProps<{
+defineProps<{
   value: string
   size?: number
 }>()

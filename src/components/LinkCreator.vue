@@ -225,12 +225,12 @@ const handleCreateLink = async (e: Event) => {
     })
 
   async function createLink() {
-    const newLink = await linksStore.createLink(
-      model.originalUrl,
-      model.customAlias || null,
-      model.expiresAt || null
-    )
-    shortUrl.value = newLink.shortUrl
+    const newLink = await linksStore.createLink({
+      originalUrl: model.originalUrl,
+      customAlias: model.customAlias || undefined,
+      expiresAt: model.expiresAt || undefined,
+    })
+    shortUrl.value = newLink?.shortUrl || ''
     resetForm()
   }
 }

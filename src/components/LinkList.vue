@@ -26,7 +26,7 @@
 
 <script setup lang="ts">
 import { h, computed, reactive, ref, watchEffect, useTemplateRef } from 'vue'
-import { type Link, useLinksStore } from '@/stores/links'
+import { useLinksStore } from '@/stores/links'
 import {
   NDataTable,
   NTag,
@@ -42,10 +42,10 @@ import {
 import { RouterLink } from 'vue-router'
 import { useMessage } from 'naive-ui'
 import { getExpirationTagType, formatDateTime } from '@/utils/dateUtils'
-import type { SortParams } from '@/api/axiosWrapper'
 import dayjs from 'dayjs'
 import type { Filter, FilterOption } from '@/components/InteractiveFilterBar.vue'
 import InteractiveFilterBar from '@/components/InteractiveFilterBar.vue'
+import type { Link, SortParams } from '@/types'
 
 const linksStore = useLinksStore()
 const loading = ref(true)
@@ -246,9 +246,9 @@ const query = async (
       sort,
       ...filters,
     }
-    const links = await linksStore.fetchLinks(params)
-    pagination.pageCount = links.pages
-    pagination.itemCount = links.total
+    await linksStore.fetchLinks(params)
+    pagination.pageCount = linksStore.totalPages
+    pagination.itemCount = linksStore.total
   } catch (error) {
     console.error('Failed to fetch links:', error)
   } finally {

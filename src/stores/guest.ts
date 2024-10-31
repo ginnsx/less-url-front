@@ -1,16 +1,6 @@
 import { defineStore } from 'pinia'
 import { encryptData, decryptData } from '@/utils/crypto'
-import { api } from '@/api/axiosWrapper'
-
-async function fetchGuestId(): Promise<string> {
-  try {
-    const response = await api.get<{ guestId: string }>('/auth/guest-id')
-    return response.data.guestId
-  } catch (error) {
-    console.error('Failed to fetch guest ID:', error)
-    throw error
-  }
-}
+import { guestApi } from '@/api/guest'
 
 export const useGuestStore = defineStore('guest', {
   state: () => ({
@@ -36,9 +26,9 @@ export const useGuestStore = defineStore('guest', {
       if (storedGuestId) {
         this.guestId = await decryptData(storedGuestId)
       } else {
-        const newGuestId = await fetchGuestId()
-        this.guestId = newGuestId
-        const encryptedGuestId = await encryptData(newGuestId)
+        const { data } = await guestApi.fetchGuestId()
+        this.guestId = data.guestId
+        const encryptedGuestId = await encryptData(data.guestId)
         localStorage.setItem('encryptedGuestId', encryptedGuestId)
       }
     },

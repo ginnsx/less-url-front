@@ -1,8 +1,8 @@
 import { defineStore } from 'pinia'
-import { api } from '@/api/axiosWrapper'
-import { useGuestStore } from '@/stores/guest'
-import { useLinksStore } from '@/stores/links'
-import type { TokenPair, AuthResponse, User, LinkDataCounts } from '@/types'
+import { authApi } from '@/api/auth'
+import { useGuestStore } from './guest'
+import { useLinksStore } from './links'
+import type { User, TokenPair, LinkDataCounts } from '@/types'
 
 export const useAuthStore = defineStore('auth', {
   state: () => ({
@@ -39,22 +39,22 @@ export const useAuthStore = defineStore('auth', {
       this.refreshToken = tokenPair.refreshToken
       this.expiresIn = tokenPair.expiresIn
     },
+
     clearTokenPair() {
       this.accessToken = null
       this.refreshToken = null
       this.expiresIn = null
       this.user = null
     },
+
     async checkEmail(email: string) {
-      const response = await api.post('/auth/check-email', { email })
+      const response = await authApi.checkEmail(email)
       return response.data.exist
     },
+
     async verifyEmailCode(email: string, verifyCode: string): Promise<boolean> {
       try {
-        await api.post('/auth/register-verification/verify', {
-          email,
-          verifyCode,
-        })
+        await authApi.verifyEmailCode(email, verifyCode)
         return true
       } catch (error) {
         console.error('Email verification failed:', error)
@@ -63,19 +63,18 @@ export const useAuthStore = defineStore('auth', {
         return false
       }
     },
+
     async login(email: string, password?: string, verifyCode?: string) {
       try {
-        const response = await api.post<AuthResponse>('/auth/login', {
-          email,
-          password,
-          verifyCode,
-        })
+        const response = await authApi.login(email, password, verifyCode)
         this.setTokenPair({
           accessToken: response.data.access_token,
           refreshToken: response.data.refresh_token,
           expiresIn: Date.now() + response.data.expires_in * 1000,
         })
         await this.fetchUserInfo()
+
+        // 处理游客数据迁移
         const guestStore = useGuestStore()
         if (guestStore.guestId) {
           const migrated = await this.migrate(guestStore.guestId)
@@ -89,70 +88,53 @@ export const useAuthStore = defineStore('auth', {
         return false
       }
     },
+
     async register(email: string, username: string, password: string, verifyCode: string) {
       try {
-        await api.post('/auth/register', {
-          email,
-          username,
-          password,
-          verifyCode,
-        })
+        await authApi.register(email, username, password, verifyCode)
         return true
       } catch (error) {
         console.error('Registration failed:', error)
         return false
       }
     },
+
     async sendVerificationCode(
       email: string,
       type: 'LOGIN' | 'REGISTER'
     ): Promise<boolean | string> {
       try {
-        const endpoint =
-          type === 'REGISTER' ? '/auth/register-verification' : '/auth/email-verification'
-        await api.post(endpoint, { email, type })
+        await authApi.sendVerificationCode(email, type)
         return true
       } catch (error) {
         console.error('Failed to send verification code:', error)
-        return (error as any).response.data.detail || '发送验���码失败'
+        return (error as any).response.data.detail || '发送验证码失败'
       }
     },
+
     async fetchUserInfo() {
       try {
-        const response = await api.get<User>('/users/me')
+        const response = await authApi.getUserInfo()
         this.user = response.data
       } catch (error) {
         console.error('Failed to fetch user info:', error)
         window['$message'].error('获取用户信息失败')
       }
     },
+
     logout() {
       this.clearTokenPair()
       this.user = null
       const guestStore = useGuestStore()
       guestStore.initGuestId()
     },
-    async migrate(guestId: string) {
-      async function showMigrationConfirmation(counts: LinkDataCounts): Promise<boolean> {
-        return new Promise((resolve) => {
-          window['$dialog'].info({
-            title: '合并本地数据',
-            content: `检查到本地有 ${counts.links} 条链接记录。是否要将这些数据合并到您的账户？`,
-            positiveText: '合并',
-            negativeText: '取消',
-            maskClosable: false,
-            closable: true,
-            onClose: () => resolve(false),
-            onPositiveClick: () => resolve(true),
-          })
-        })
-      }
 
+    async migrate(guestId: string) {
       const linkStore = useLinksStore()
       try {
         const data = await linkStore.countLinks({ requiredGuest: true })
         if (data.links > 0) {
-          const shouldMigrate = await showMigrationConfirmation(data)
+          const shouldMigrate = await this.showMigrationConfirmation(data)
           if (shouldMigrate) {
             return await this.migrateGuestData(guestId)
           }
@@ -165,10 +147,10 @@ export const useAuthStore = defineStore('auth', {
 
     async migrateGuestData(guestId: string) {
       try {
-        const { data } = await api.post<LinkDataCounts>('/users/migrate', { guestId })
+        const response = await authApi.migrateGuestData(guestId)
         window['$notification'].success({
           title: '合并本地数据',
-          content: `成功合并 ${data.links} 条链接记录和 ${data.analytics} 条分析记录`,
+          content: `成功合并 ${response.data.links} 条链接记录和 ${response.data.analytics} 条分析记录`,
         })
         return true
       } catch (error) {
@@ -179,6 +161,21 @@ export const useAuthStore = defineStore('auth', {
         })
         return false
       }
+    },
+
+    async showMigrationConfirmation(counts: LinkDataCounts): Promise<boolean> {
+      return new Promise((resolve) => {
+        window['$dialog'].info({
+          title: '合并本地数据',
+          content: `检查到本地有 ${counts.links} 条链接记录。是否要将这些数据合并到您的账户？`,
+          positiveText: '合并',
+          negativeText: '取消',
+          maskClosable: false,
+          closable: true,
+          onClose: () => resolve(false),
+          onPositiveClick: () => resolve(true),
+        })
+      })
     },
   },
   persist: {

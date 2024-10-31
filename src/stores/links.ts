@@ -1,23 +1,52 @@
 import { defineStore } from 'pinia'
-import { LinkService } from '@/services/linkService'
-import type { Link, LinkDataCounts, QueryParams, PaginationResponse } from '@/types'
+import { linksApi } from '@/api/links'
+import type { Link, LinkDataCounts, QueryParams } from '@/types'
 
-const useLinksStore = defineStore('links', {
+export const useLinksStore = defineStore('links', {
   state: () => ({
     links: [] as Link[],
-    currentLink: null as Link | null,
+    total: 0,
+    loading: false,
+    currentPage: 1,
+    pageSize: 10,
+    totalPages: 0,
   }),
+
   actions: {
-    async fetchLinks(params: QueryParams = {}): Promise<PaginationResponse<Link>> {
+    async createLink(data: {
+      originalUrl: string
+      customAlias?: string
+      expiresAt?: number
+    }): Promise<Link | null> {
       try {
-        const response = await LinkService.getLinks(params)
-        this.links = response.records ?? []
-        return response
+        const response = await linksApi.createLink(data)
+        await this.fetchRecentLinks() // 刷新列表
+        return response.data
       } catch (error) {
-        console.error('Failed to fetch links:', error)
-        throw error
+        console.error('Failed to create link:', error)
+        return null
       }
     },
+
+    async fetchLinks(params: QueryParams = {}) {
+      this.loading = true
+      try {
+        const response = await linksApi.getLinks({
+          page: this.currentPage,
+          size: this.pageSize,
+          ...params,
+        })
+        this.links = response.data.records ?? []
+        this.total = response.data.total ?? 0
+        this.totalPages = response.data.pages ?? 0
+      } catch (error) {
+        console.error('Failed to fetch links:', error)
+        window['$message'].error('获取链接列表失败')
+      } finally {
+        this.loading = false
+      }
+    },
+
     async fetchRecentLinks() {
       try {
         await this.fetchLinks({
@@ -29,48 +58,55 @@ const useLinksStore = defineStore('links', {
         })
       } catch (error) {
         console.error('Failed to fetch recent links:', error)
-        throw error
       }
     },
-    async createLink(originalUrl: string, customAlias: string | null, expiresAt: number | null) {
+
+    async updateLink(id: string, data: Partial<Link>) {
       try {
-        const newLink = await LinkService.createLink(originalUrl, customAlias, expiresAt)
-        this.currentLink = newLink
-        await this.fetchRecentLinks()
-        return newLink
+        await linksApi.updateLink(id, data)
+        await this.fetchLinks() // 刷新列表
+        return true
       } catch (error) {
-        console.error('Failed to create link:', error)
-        throw error
+        console.error('Failed to update link:', error)
+        return false
       }
     },
-    async fetchLinkDetails(id: string): Promise<Link> {
+
+    async deleteLink(id: string) {
       try {
-        this.currentLink = await LinkService.getLinkDetails(id)
-        return this.currentLink
+        await linksApi.deleteLink(id)
+        await this.fetchLinks() // 刷新列表
+        return true
       } catch (error) {
-        console.error('Failed to fetch link details:', error)
-        throw error
+        console.error('Failed to delete link:', error)
+        return false
       }
     },
-    async countLinks({
-      requiredGuest = false,
-      requiredJWT = false,
-    }: {
-      requiredGuest?: boolean
-      requiredJWT?: boolean
-    } = {}) {
+
+    async countLinks(
+      params: { requiredGuest?: boolean; requiredJWT?: boolean } = {}
+    ): Promise<LinkDataCounts> {
       try {
-        return await LinkService.countLinks({ requiredGuest, requiredJWT })
+        const { data } = await linksApi.countLinks(params)
+        return data
       } catch (error) {
         console.error('Failed to count links:', error)
-        throw error
+        return { links: 0, analytics: 0 }
       }
     },
+
+    setPage(page: number) {
+      this.currentPage = page
+    },
+
+    setPageSize(size: number) {
+      this.pageSize = size
+      this.currentPage = 1 // 重置到第一页
+    },
+
     clearLinks() {
       this.links = []
-      this.currentLink = null
+      this.total = 0
     },
   },
 })
-
-export { type Link, type LinkDataCounts, useLinksStore }

@@ -26,8 +26,7 @@ import { useLinksStore } from '@/stores/links'
 import { NGrid, NGi, NStatistic, NIcon, NText, NCard, NNumberAnimation } from 'naive-ui'
 import { LinkOutline, EyeOutline, TrendingUpOutline, CalendarOutline } from '@vicons/ionicons5'
 import dayjs from 'dayjs'
-import { type LinkDataCounts, type Link } from '@/stores/links'
-import { LinkService } from '@/services/linkService'
+import { type LinkDataCounts, type Link } from '@/types'
 
 const linksStore = useLinksStore()
 
@@ -46,12 +45,12 @@ onMounted(async () => {
 })
 
 onMounted(async () => {
-  const data = await LinkService.getLinks({
+  await linksStore.fetchLinks({
     page: 1,
     size: 1,
     sort: { created_at: 'desc' },
   })
-  latestLink.value = data.records[0]
+  latestLink.value = linksStore.links[0]
 })
 
 const stats = computed(() => [
