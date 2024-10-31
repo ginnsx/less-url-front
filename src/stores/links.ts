@@ -1,22 +1,6 @@
 import { defineStore } from 'pinia'
 import { LinkService } from '@/services/linkService'
-import type { QueryParams, PaginationResponse } from '@/api/axiosWrapper'
-
-interface Link {
-  id: string
-  shortUrl: string
-  originalUrl: string
-  visits: number
-  isCustom: boolean
-  createdAt: number
-  updatedAt: number
-  expiresAt: number
-}
-
-interface LinkDataCounts {
-  links: number
-  analytics: number
-}
+import type { Link, LinkDataCounts, QueryParams, PaginationResponse } from '@/types'
 
 const useLinksStore = defineStore('links', {
   state: () => ({

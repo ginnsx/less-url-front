@@ -47,7 +47,8 @@
 import { computed, ref } from 'vue'
 import { NSelect, NDatePicker, NModal, NButton, NFlex } from 'naive-ui'
 import { storeToRefs } from 'pinia'
-import { useAnalysisStore, type TimeRangeType } from '@/stores/analysis'
+import { useAnalysisStore } from '@/stores/analysis'
+import type { TimeRangeType } from '@/types'
 import dayjs from 'dayjs'
 
 const analysisStore = useAnalysisStore()

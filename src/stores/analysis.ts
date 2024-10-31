@@ -1,20 +1,6 @@
 import { defineStore } from 'pinia'
 import dayjs from 'dayjs'
-
-export type TimeRangeType =
-  | 'today'
-  | 'last24h'
-  | 'thisWeek'
-  | 'last7d'
-  | 'thisMonth'
-  | 'last30d'
-  | 'last90d'
-  | 'custom'
-
-interface TimeRangeState {
-  selectedTimeRange: TimeRangeType
-  timeRange: [number, number]
-}
+import type { TimeRangeState, TimeRangeType } from '@/types'
 
 export const useAnalysisStore = defineStore('analysis', {
   state: (): TimeRangeState => ({

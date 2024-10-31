@@ -1,55 +1,7 @@
 import axios, { type AxiosInstance, type AxiosRequestConfig, type AxiosResponse } from 'axios'
-import { type TokenPair, useAuthStore } from '@/stores/auth'
+import { useAuthStore } from '@/stores/auth'
 import { useGuestStore } from '@/stores/guest'
-
-// 定义分页参数接口，支持页码分页和游标分页
-interface PaginationParams {
-  page?: number
-  size?: number
-  after?: string | number
-}
-
-interface PaginationResponse<T> {
-  records: T[]
-  total: number
-  pages: number
-  size: number
-  current: number
-}
-
-// 定义排序参数接口
-interface SortParams {
-  [key: string]: 'asc' | 'desc'
-}
-
-// 定义查询参数接口，继承分页参数并添加排序和其他自定义参数
-interface QueryParams extends PaginationParams {
-  sort?: SortParams
-  [key: string]: any
-}
-
-// 扩展 Axios 配置接口，添加自定义配置项
-interface AxiosWrapperConfig extends AxiosRequestConfig {
-  baseURL: string
-  tokenRefreshURL: string
-  authorizationHeader?: string
-}
-
-interface AxiosWrapperRequestConfig extends AxiosRequestConfig {
-  requireAuth?: boolean
-  requiredGuest?: boolean
-  requiredJWT?: boolean
-  noAuth?: boolean
-}
-
-export type {
-  PaginationParams,
-  PaginationResponse,
-  SortParams,
-  QueryParams,
-  AxiosWrapperConfig,
-  AxiosWrapperRequestConfig,
-}
+import type { TokenPair, QueryParams, AxiosWrapperConfig, AxiosWrapperRequestConfig } from '@/types'
 
 class AxiosWrapper {
   private instance: AxiosInstance

@@ -19,11 +19,7 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import { NProgress } from 'naive-ui'
-
-interface DataItem {
-  name: string
-  value: number
-}
+import type { DataItem } from '@/types'
 
 interface Props {
   data: DataItem[]

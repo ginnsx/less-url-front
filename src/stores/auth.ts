@@ -2,31 +2,7 @@ import { defineStore } from 'pinia'
 import { api } from '@/api/axiosWrapper'
 import { useGuestStore } from '@/stores/guest'
 import { useLinksStore } from '@/stores/links'
-
-// 定义 JWT 令牌对的接口
-export interface TokenPair {
-  accessToken: string
-  refreshToken: string
-  expiresIn: number
-}
-
-interface AuthResponse {
-  access_token: string
-  refresh_token: string
-  expires_in: number
-}
-
-interface LinkDataCounts {
-  links: number
-  analytics: number
-}
-
-interface User {
-  userId: string
-  email: string
-  nickname: string
-  authorities: { authority: string }[]
-}
+import type { TokenPair, AuthResponse, User, LinkDataCounts } from '@/types'
 
 export const useAuthStore = defineStore('auth', {
   state: () => ({
@@ -138,7 +114,7 @@ export const useAuthStore = defineStore('auth', {
         return true
       } catch (error) {
         console.error('Failed to send verification code:', error)
-        return (error as any).response.data.detail || '发送验证码失败'
+        return (error as any).response.data.detail || '发送验���码失败'
       }
     },
     async fetchUserInfo() {

@@ -38,11 +38,7 @@ import ProgressList from '@/components/ProgressList.vue'
 import PieChart from '@/components/PieChart.vue'
 import { debounce } from 'lodash-es'
 import { ScanOutline } from '@vicons/ionicons5'
-
-interface DataItem {
-  name: string
-  value: number
-}
+import type { DataItem } from '@/types'
 
 interface Props {
   data: DataItem[]
