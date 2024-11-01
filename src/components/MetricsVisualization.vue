@@ -1,9 +1,9 @@
 <template>
   <div>
-    <n-grid cols="24" x-gap="12" y-gap="8" :item-responsive="true" responsive="self">
-      <n-grid-item span="24">
+    <n-flex vertical align="stretch">
+      <div flex="1" style="height: 300px">
         <ProgressList :data="limitedData" />
-        <div class="view-more">
+        <div class="view-more" v-if="data.length > 5">
           <n-button text type="default" @click="showDetailsModal = true" class="view-more-btn">
             <template #icon>
               <n-icon><ScanOutline /></n-icon>
@@ -11,11 +11,10 @@
             <span class="btn-text">DETAILS</span>
           </n-button>
         </div>
-      </n-grid-item>
-      <n-grid-item span="24">
-        <PieChart ref="pieChartRef" :data="limitedData" :theme="themeName" :height="400" />
-      </n-grid-item>
-    </n-grid>
+      </div>
+
+      <PieChart ref="pieChartRef" :data="limitedData" :theme="themeName" :height="400" />
+    </n-flex>
 
     <!-- 详细数据弹窗 -->
     <n-modal
@@ -32,10 +31,10 @@
 
 <script setup lang="ts">
 import { ref, computed, onMounted, onUnmounted } from 'vue'
-import { NGrid, NGridItem, NButton, NModal, NIcon } from 'naive-ui'
+import { NButton, NModal, NIcon, NFlex } from 'naive-ui'
 import { useThemesStore } from '@/stores/themes'
-import ProgressList from '@/components/ProgressList.vue'
-import PieChart from '@/components/PieChart.vue'
+import ProgressList from './ProgressList.vue'
+import PieChart from './PieChart.vue'
 import { debounce } from 'lodash-es'
 import { ScanOutline } from '@vicons/ionicons5'
 import type { MetricsData } from '@/types'

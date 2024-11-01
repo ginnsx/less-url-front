@@ -151,11 +151,10 @@ import {
 import { useMessage } from 'naive-ui'
 import QRCode from './QRCode.vue'
 import { formatDateTime as formatDate, getExpirationTagType } from '@/utils/dateUtils'
-import type { Link } from '@/types'
 
 const linksStore = useLinksStore()
 
-const recentLinks = ref<Link[]>([])
+const recentLinks = computed(() => linksStore.links)
 const displayCount = ref(5)
 const expandedLinks = ref<string[]>([])
 const loading = ref(false)
@@ -185,7 +184,7 @@ const toggleExpand = (link: { id: string }) => {
 const message = useMessage()
 
 onMounted(async () => {
-  recentLinks.value = await linksStore.fetchRecentLinks()
+  await linksStore.fetchRecentLinks()
 })
 
 const copyToClipboard = (text: string) => {

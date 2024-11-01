@@ -34,7 +34,7 @@
         <n-grid-item span="24" v-if="timeseriesData.length > 0">
           <VisitChart :data="timeseriesData" />
         </n-grid-item>
-        <n-grid-item span="24" v-if="locationData.length > 0">
+        <n-grid-item span="24" v-if="countryData.length > 0">
           <GeoDistribution
             :tabs="locationTabs"
             :country-data="countryData"
@@ -46,7 +46,7 @@
           <MetricsGroup
             title="来源分析"
             :tabs="referrerTabs"
-            :data="referrerData"
+            :data="displayReferrerData"
             @tab-change="(key) => (referrerType = key as 'referer' | 'referer_type')"
           />
         </n-grid-item>
@@ -54,7 +54,7 @@
           <MetricsGroup
             title="语言分析"
             :tabs="languageTabs"
-            :data="languageData"
+            :data="displayLanguageData"
             @tab-change="(key) => (languageType = key as 'language' | 'timezone')"
           />
         </n-grid-item>
@@ -62,7 +62,7 @@
           <MetricsGroup
             title="设备分析"
             :tabs="deviceTabs"
-            :data="deviceData"
+            :data="displayDeviceData"
             @tab-change="(key) => (deviceType = key as 'device_type' | 'brand' | 'device')"
           />
         </n-grid-item>
@@ -70,7 +70,7 @@
           <MetricsGroup
             title="平台分析"
             :tabs="platformTabs"
-            :data="platformData"
+            :data="displayPlatformData"
             @tab-change="(key) => (platformType = key as 'os' | 'browser')"
           />
         </n-grid-item>
@@ -158,6 +158,22 @@ const fetchAll = async () => {
   deviceData.value = device?.data || []
   platformData.value = platform?.data || []
 }
+
+const displayReferrerData = computed(() => {
+  return referrerData.value.filter((item) => item.name)
+})
+
+const displayLanguageData = computed(() => {
+  return languageData.value.filter((item) => item.name)
+})
+
+const displayDeviceData = computed(() => {
+  return deviceData.value.filter((item) => item.name)
+})
+
+const displayPlatformData = computed(() => {
+  return platformData.value.filter((item) => item.name)
+})
 
 const timeRange = computed(() => analysisStore.timeRange)
 

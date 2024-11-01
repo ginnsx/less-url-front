@@ -19,8 +19,8 @@
 
 <script setup lang="ts">
 import { computed, ref } from 'vue'
-import MetricsGroup from '@/components/MetricsGroup.vue'
-import WorldMap from '@/components/WorldMap.vue'
+import MetricsGroup from './MetricsGroup.vue'
+import WorldMap from './WorldMap.vue'
 import { NCard } from 'naive-ui'
 import type { LocationData } from '@/types'
 
@@ -41,10 +41,12 @@ const countryMetricsData = computed(() => {
 })
 
 const currentTabData = computed(() => {
-  return props.locationData.map((item) => ({
-    name: item[currentTab.value]!,
-    value: item.value,
-  }))
+  return props.locationData
+    .filter((item) => item[currentTab.value])
+    .map((item) => ({
+      name: item[currentTab.value]!,
+      value: item.value,
+    }))
 })
 
 const handleTabChange = (key: string) => {

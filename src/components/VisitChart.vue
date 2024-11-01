@@ -11,10 +11,13 @@ import { NCard } from 'naive-ui'
 import dayjs from 'dayjs'
 import { useThemesStore } from '@/stores/themes'
 import type { TimeseriesData } from '@/types'
+import { useAnalysisStore } from '@/stores/analysis'
 
 const props = defineProps<{
   data: TimeseriesData[]
 }>()
+
+const analysisStore = useAnalysisStore()
 
 const themesStore = useThemesStore()
 
@@ -23,6 +26,8 @@ const chartRef = ref<HTMLElement>()
 const timeseriesData = computed(() => props.data)
 
 const themeName = computed(() => themesStore.themeName)
+
+const isDay = computed(() => analysisStore.timeUnitType === 'day')
 
 onMounted(() => {
   const chart = echarts.init(chartRef.value!, themeName.value)
@@ -38,7 +43,9 @@ onMounted(() => {
     tooltip: {
       trigger: 'axis',
       formatter: function (params: any) {
-        const date = dayjs(timeseriesData.value[params[0].dataIndex].time).format('YYYY-MM-DD')
+        const date = dayjs(timeseriesData.value[params[0].dataIndex].time).format(
+          isDay.value ? 'YYYY-MM-DD' : 'DD HH:mm'
+        )
         return `${date}<br/>
                 访问量: ${params[0].value}<br/>
                 访客数: ${params[1].value}`
@@ -50,7 +57,9 @@ onMounted(() => {
     xAxis: {
       type: 'category',
       boundaryGap: false, // 坐标轴两边留白策略
-      data: timeseriesData.value.map((item) => dayjs(item.time).format('YYYY-MM-DD')),
+      data: timeseriesData.value.map((item) =>
+        dayjs(item.time).format(isDay.value ? 'YYYY-MM-DD' : 'DD HH:mm')
+      ),
     },
     yAxis: {
       type: 'value',

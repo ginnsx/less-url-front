@@ -11,7 +11,7 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import { NCard, NTabs, NTabPane } from 'naive-ui'
-import MetricsVisualization from '@/components/MetricsVisualization.vue'
+import MetricsVisualization from './MetricsVisualization.vue'
 import type { MetricsData } from '@/types'
 
 interface TabItem {

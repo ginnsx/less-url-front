@@ -16,19 +16,19 @@
       preset="card"
       transform-origin="center"
       class="custom-modal"
-      size="medium"
+      size="large"
       :bordered="false"
       :segmented="{
         content: 'soft',
         footer: 'soft',
       }"
-      :style="{ width: '600px' }"
+      :style="{ width: '640px' }"
     >
       <n-date-picker
         panel
         v-model:value="tempDateRange"
         type="daterange"
-        size="large"
+        size="medium"
         update-value-on-close
         :is-date-disabled="disableFutureDates"
         :clearable="false"

@@ -28,7 +28,7 @@
           </n-button>
         </n-flex>
         <n-button @click="applyFilters" type="primary" class="action-btn apply-filter-btn" round>
-          应用过滤器
+          查询
         </n-button>
       </n-flex>
       <n-flex wrap>

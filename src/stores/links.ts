@@ -59,17 +59,15 @@ export const useLinksStore = defineStore('links', {
 
     async fetchRecentLinks() {
       try {
-        const response = await linksApi.getLinks({
+        await this.fetchLinks({
           page: 1,
           size: 50,
           sort: {
             created_at: 'desc',
           },
         })
-        return response.data.records ?? []
       } catch (error) {
         console.error('Failed to fetch recent links:', error)
-        return []
       }
     },
 
