@@ -48,8 +48,13 @@ export const useAuthStore = defineStore('auth', {
     },
 
     async checkEmail(email: string) {
-      const response = await authApi.checkEmail(email)
-      return response.data.exist
+      try {
+        const response = await authApi.checkEmail(email)
+        return response.data.exist
+      } catch (error) {
+        console.error('Failed to check email:', error)
+        return false
+      }
     },
 
     async verifyEmailCode(email: string, verifyCode: string): Promise<boolean> {

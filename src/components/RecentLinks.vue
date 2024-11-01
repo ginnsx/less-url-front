@@ -113,9 +113,9 @@
         <n-spin v-if="loading" size="small" />
         <n-text v-if="noMoreLinks" depth="3">
           {{
-            linksStore.links.length >= 50
+            recentLinks.length >= 50
               ? '只显示最近 50 条'
-              : `${linksStore.links.length} 条链接，没有更多了`
+              : `${recentLinks.length} 条链接，没有更多了`
           }}
         </n-text>
       </n-flex>
@@ -151,16 +151,18 @@ import {
 import { useMessage } from 'naive-ui'
 import QRCode from './QRCode.vue'
 import { formatDateTime as formatDate, getExpirationTagType } from '@/utils/dateUtils'
+import type { Link } from '@/types'
 
 const linksStore = useLinksStore()
 
+const recentLinks = ref<Link[]>([])
 const displayCount = ref(5)
 const expandedLinks = ref<string[]>([])
 const loading = ref(false)
 
-const displayedLinks = computed(() => [...linksStore.links].slice(0, displayCount.value))
+const displayedLinks = computed(() => [...recentLinks.value].slice(0, displayCount.value))
 
-const noMoreLinks = computed(() => displayedLinks.value.length >= linksStore.links.length)
+const noMoreLinks = computed(() => displayedLinks.value.length >= recentLinks.value.length)
 
 const loadMore = () => {
   if (loading.value || noMoreLinks.value) return
@@ -182,16 +184,8 @@ const toggleExpand = (link: { id: string }) => {
 
 const message = useMessage()
 
-const fetchLinks = async () => {
-  try {
-    await linksStore.fetchRecentLinks()
-  } catch (error) {
-    console.error('Failed to fetch links:', error)
-  }
-}
-
 onMounted(async () => {
-  await fetchLinks()
+  recentLinks.value = await linksStore.fetchRecentLinks()
 })
 
 const copyToClipboard = (text: string) => {

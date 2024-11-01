@@ -45,12 +45,7 @@ onMounted(async () => {
 })
 
 onMounted(async () => {
-  await linksStore.fetchLinks({
-    page: 1,
-    size: 1,
-    sort: { created_at: 'desc' },
-  })
-  latestLink.value = linksStore.links[0]
+  latestLink.value = await linksStore.fetchLatestLink()
 })
 
 const stats = computed(() => [

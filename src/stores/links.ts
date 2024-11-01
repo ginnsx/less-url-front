@@ -5,10 +5,10 @@ import type { Link, LinkDataCounts, QueryParams } from '@/types'
 export const useLinksStore = defineStore('links', {
   state: () => ({
     links: [] as Link[],
-    total: 0,
     loading: false,
     currentPage: 1,
     pageSize: 10,
+    total: 0,
     totalPages: 0,
   }),
 
@@ -49,15 +49,17 @@ export const useLinksStore = defineStore('links', {
 
     async fetchRecentLinks() {
       try {
-        await this.fetchLinks({
+        const response = await linksApi.getLinks({
           page: 1,
           size: 50,
           sort: {
             created_at: 'desc',
           },
         })
+        return response.data.records ?? []
       } catch (error) {
         console.error('Failed to fetch recent links:', error)
+        return []
       }
     },
 
@@ -92,6 +94,20 @@ export const useLinksStore = defineStore('links', {
       } catch (error) {
         console.error('Failed to count links:', error)
         return { links: 0, analytics: 0 }
+      }
+    },
+
+    async fetchLatestLink() {
+      try {
+        const response = await linksApi.getLinks({
+          page: 1,
+          size: 1,
+          sort: { created_at: 'desc' },
+        })
+        return response.data.records[0]
+      } catch (error) {
+        console.error('Failed to fetch latest link:', error)
+        return null
       }
     },
 

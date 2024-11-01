@@ -12,7 +12,7 @@
       remote
       ref="table"
       :columns="columns"
-      :data="datas"
+      :data="links"
       :loading="loading"
       :pagination="pagination"
       :bordered="false"
@@ -25,7 +25,7 @@
 </template>
 
 <script setup lang="ts">
-import { h, computed, reactive, ref, watchEffect, useTemplateRef } from 'vue'
+import { h, computed, ref, watchEffect, useTemplateRef } from 'vue'
 import { useLinksStore } from '@/stores/links'
 import {
   NDataTable,
@@ -46,9 +46,10 @@ import dayjs from 'dayjs'
 import type { Filter, FilterOption } from '@/components/InteractiveFilterBar.vue'
 import InteractiveFilterBar from '@/components/InteractiveFilterBar.vue'
 import type { Link, SortParams } from '@/types'
+import { storeToRefs } from 'pinia'
 
 const linksStore = useLinksStore()
-const loading = ref(true)
+const { links, loading, currentPage, pageSize, totalPages } = storeToRefs(linksStore)
 const message = useMessage()
 const tableRef = useTemplateRef<DataTableInst>('table')
 
@@ -184,29 +185,32 @@ const columns = computed<DataTableColumns<Link>>(() => [
   },
 ])
 
-const pagination = reactive<PaginationProps>({
-  page: 1,
-  pageCount: 1,
-  pageSize: 10,
+// 分页事件处理
+const paginationHandlers = {
+  onChange: (page: number) => {
+    linksStore.setPage(page)
+  },
+  onUpdatePageSize: (pageSize: number) => {
+    linksStore.setPageSize(pageSize)
+  },
+} as const
+
+// 分页的动态部分
+const pagination = computed<PaginationProps>(() => ({
+  page: currentPage.value,
+  pageCount: totalPages.value,
+  pageSize: pageSize.value,
   showSizePicker: true,
   pageSizes: [10, 20, 50],
   prefix: ({ itemCount }) => `共 ${itemCount} 条`,
-  onChange: (page: number) => {
-    pagination.page = page
-  },
-  onUpdatePageSize: (pageSize: number) => {
-    pagination.pageSize = pageSize
-    pagination.page = 1
-  },
-})
+  ...paginationHandlers,
+}))
 
 const filterParams = ref<Record<string, any>>({})
 
 const sorters = ref<SortParams>({})
 
 const hasSorter = computed(() => Object.keys(sorters.value).length > 0)
-
-const datas = computed(() => linksStore.links)
 
 const handleSorterChange = async (sorter: DataTableSortState) => {
   if (!sorter || Object.keys(sorter).length === 0) {
@@ -218,41 +222,30 @@ const handleSorterChange = async (sorter: DataTableSortState) => {
     const sort = { [columnKey]: sortOrder } as SortParams
     sorters.value = sort
   }
-  pagination.page = 1
+  linksStore.setPage(1)
 }
 
 const clearSorter = () => {
   sorters.value = {}
-  pagination.page = 1
+  linksStore.setPage(1)
   tableRef.value?.clearSorter()
 }
 
-const query = async (
-  page: number = 1,
-  pageSize: number = 10,
-  {
-    sort,
-    filters,
-  }: {
-    sort?: SortParams
-    filters?: Record<string, any>
-  } = {}
-): Promise<void> => {
-  loading.value = true
+const query = async ({
+  sort,
+  filters,
+}: {
+  sort?: SortParams
+  filters?: Record<string, any>
+} = {}): Promise<void> => {
   try {
     const params = {
-      page,
-      size: pageSize,
       sort,
       ...filters,
     }
     await linksStore.fetchLinks(params)
-    pagination.pageCount = linksStore.totalPages
-    pagination.itemCount = linksStore.total
   } catch (error) {
     console.error('Failed to fetch links:', error)
-  } finally {
-    loading.value = false
   }
 }
 
@@ -358,13 +351,13 @@ const applyFilters = async (filters: Filter[]) => {
     queryParams[queryKey] = value
   })
 
-  pagination.page = 1
+  linksStore.setPage(1)
   filterParams.value = queryParams
 }
 
 watchEffect(
   async () =>
-    await query(pagination.page, pagination.pageSize, {
+    await query({
       sort: sorters.value,
       filters: filterParams.value,
     })

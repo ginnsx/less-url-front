@@ -8,10 +8,10 @@ export interface PaginationParams {
 
 export interface PaginationResponse<T> {
   records: T[]
-  total: number
-  pages: number
-  size: number
-  current: number
+  total: number // 总条数
+  pages: number // 总页数
+  size: number // 每页条数
+  current: number // 当前页码
 }
 
 export interface SortParams {
