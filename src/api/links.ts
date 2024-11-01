@@ -10,6 +10,10 @@ export const linksApi = {
     return api.get<PaginationResponse<Link>>('/links', params)
   },
 
+  getLink: async (id: string) => {
+    return api.get<Link>(`/links/${id}`)
+  },
+
   updateLink: async (id: string, data: Partial<Link>) => {
     return api.put<Link>(`/links/${id}`, data)
   },

@@ -16,11 +16,13 @@
       preset="card"
       transform-origin="center"
       class="custom-modal"
-      size="large"
+      size="medium"
       :bordered="false"
       :segmented="{
         content: 'soft',
+        footer: 'soft',
       }"
+      :style="{ width: '600px' }"
     >
       <n-date-picker
         panel
@@ -55,12 +57,12 @@ const analysisStore = useAnalysisStore()
 const { selectedTimeRange, timeRange } = storeToRefs(analysisStore)
 
 const showDatePicker = ref(false)
-const tempDateRange = ref<[number, number]>(timeRange.value)
+const tempDateRange = ref<[number, number]>([timeRange.value.start, timeRange.value.end])
 
 // 添加一个计算属性来处理自定义日期范围的显示
 const timeRangeLabel = computed(() => {
   if (selectedTimeRange.value === 'custom' && timeRange.value) {
-    const [start, end] = timeRange.value
+    const { start, end } = timeRange.value
     return `${dayjs(start).format('YYYY-MM-DD')} 至 ${dayjs(end).format('YYYY-MM-DD')}`
   }
   return undefined
@@ -77,6 +79,9 @@ const timeRangeOptions = computed(() => [
   { label: '本月', value: 'thisMonth' },
   { label: '最近30天', value: 'last30d' },
   { label: '最近90天', value: 'last90d' },
+  { label: '年', value: 'year', disabled: true },
+  { label: '今年', value: 'thisYear' },
+  { label: '最近12个月', value: 'last12m' },
   { label: '任意时间', value: 'anytime', disabled: true },
   {
     label: selectedTimeRange.value === 'custom' ? timeRangeLabel.value : '自定义',
@@ -84,7 +89,7 @@ const timeRangeOptions = computed(() => [
   },
 ])
 
-const getTimeRange = (range: string): [number, number] => {
+const getTimeRange = (range: TimeRangeType): [number, number] => {
   const now = dayjs()
   switch (range) {
     case 'today':
@@ -101,6 +106,10 @@ const getTimeRange = (range: string): [number, number] => {
       return [now.subtract(29, 'day').startOf('day').valueOf(), now.endOf('day').valueOf()]
     case 'last90d':
       return [now.subtract(89, 'day').startOf('day').valueOf(), now.endOf('day').valueOf()]
+    case 'thisYear':
+      return [now.startOf('year').valueOf(), now.endOf('year').valueOf()]
+    case 'last12m':
+      return [now.subtract(11, 'month').startOf('month').valueOf(), now.endOf('day').valueOf()]
     default:
       return [now.startOf('day').valueOf(), now.endOf('day').valueOf()]
   }
@@ -110,9 +119,9 @@ const disableFutureDates = (ts: number) => {
   return ts > dayjs().valueOf()
 }
 
-const handleTimeRangeChange = (value: string) => {
+const handleTimeRangeChange = (value: TimeRangeType) => {
   if (value === 'custom') {
-    tempDateRange.value = timeRange.value
+    tempDateRange.value = [timeRange.value.start, timeRange.value.end]
     showDatePicker.value = true
   } else {
     const [start, end] = getTimeRange(value)
@@ -137,10 +146,6 @@ const handleModalCancel = () => {
 </script>
 
 <style scoped>
-.custom-modal {
-  width: 600px;
-}
-
 .time-range-select {
   min-width: 120px;
 }

@@ -6,7 +6,7 @@
           <n-flex align="center">
             <n-h2 style="margin: 0">
               <n-text type="default">
-                {{ currentLink?.shortUrl }}
+                {{ currentLink?.shortUrl || '' }}
               </n-text>
               <n-tag
                 class="inline copy-btn"
@@ -31,23 +31,48 @@
         <n-grid-item span="24">
           <StatisticsCards :stats="linkStats" :icon-color="iconColor" />
         </n-grid-item>
-        <n-grid-item span="24">
-          <VisitChart />
+        <n-grid-item span="24" v-if="timeseriesData.length > 0">
+          <VisitChart :data="timeseriesData" />
         </n-grid-item>
-        <n-grid-item span="24">
-          <GeoDistribution />
+        <n-grid-item span="24" v-if="locationData.length > 0">
+          <GeoDistribution
+            :tabs="locationTabs"
+            :country-data="countryData"
+            :location-data="locationData"
+            @tab-change="(key) => (locationType = key as 'country' | 'region' | 'city')"
+          />
         </n-grid-item>
-        <n-grid-item span="24 m:12">
-          <MetricsGroup title="来源分析" :tabs="sourceTabs" :data="sourceData" />
+        <n-grid-item span="24 m:12" v-if="referrerData.length > 0">
+          <MetricsGroup
+            title="来源分析"
+            :tabs="referrerTabs"
+            :data="referrerData"
+            @tab-change="(key) => (referrerType = key as 'referer' | 'referer_type')"
+          />
         </n-grid-item>
-        <n-grid-item span="24 m:12">
-          <MetricsGroup title="语言分析" :tabs="languageTabs" :data="languageData" />
+        <n-grid-item span="24 m:12" v-if="languageData.length > 0">
+          <MetricsGroup
+            title="语言分析"
+            :tabs="languageTabs"
+            :data="languageData"
+            @tab-change="(key) => (languageType = key as 'language' | 'timezone')"
+          />
         </n-grid-item>
-        <n-grid-item span="24 m:12">
-          <MetricsGroup title="设备分析" :tabs="deviceTabs" :data="deviceData" />
+        <n-grid-item span="24 m:12" v-if="deviceData.length > 0">
+          <MetricsGroup
+            title="设备分析"
+            :tabs="deviceTabs"
+            :data="deviceData"
+            @tab-change="(key) => (deviceType = key as 'device_type' | 'brand' | 'device')"
+          />
         </n-grid-item>
-        <n-grid-item span="24 m:12">
-          <MetricsGroup title="平台分析" :tabs="platformTabs" :data="platformData" />
+        <n-grid-item span="24 m:12" v-if="platformData.length > 0">
+          <MetricsGroup
+            title="平台分析"
+            :tabs="platformTabs"
+            :data="platformData"
+            @tab-change="(key) => (platformType = key as 'os' | 'browser')"
+          />
         </n-grid-item>
       </n-grid>
     </n-card>
@@ -55,7 +80,7 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, computed, ref } from 'vue'
+import { onMounted, computed, ref, watch } from 'vue'
 import { useRoute } from 'vue-router'
 import { NH2, NCard, NFlex, NGrid, NText, NTag, NIcon, NGridItem } from 'naive-ui'
 import { useMessage } from 'naive-ui'
@@ -67,123 +92,189 @@ import {
   LinkOutline,
 } from '@vicons/ionicons5'
 import { useLinksStore } from '@/stores/links'
+import { useAnalysisStore } from '@/stores/analysis'
 import VisitChart from '@/components/VisitChart.vue'
 import GeoDistribution from '@/components/GeoDistribution.vue'
 import StatisticsCards from '@/components/StatisticsCards.vue'
 import MetricsGroup from '@/components/MetricsGroup.vue'
 import TimeRangeSelector from '@/components/TimeRangeSelector.vue'
-
-const route = useRoute()
-const linksStore = useLinksStore()
-
-const currentLink = computed(() => linksStore.currentLink)
-
-onMounted(async () => {
-  // const [start, end] = getTimeRange(selectedTimeRange.value)
-  // await updateAnalytics(start, end)
-})
-
-const copied = ref(false)
+import type { Link, LocationData, BasicData, TimeseriesData, MetricsData } from '@/types'
 
 const message = useMessage()
-const copyToClipboard = () => {
-  navigator.clipboard.writeText(currentLink.value?.shortUrl!).then(() => {
-    copied.value = true
-    setTimeout(() => {
-      copied.value = false
-    }, 5000)
-    message.success('短链接已复制到剪贴板')
-  })
+const route = useRoute()
+const linksStore = useLinksStore()
+const analysisStore = useAnalysisStore()
+
+const basicData = ref<BasicData | null>(null)
+const timeseriesData = ref<TimeseriesData[]>([])
+
+const locationType = ref<'country' | 'region' | 'city'>('country')
+const locationData = ref<LocationData[]>([])
+const countryData = ref<LocationData[]>([])
+
+const referrerType = ref<'referer' | 'referer_type'>('referer')
+const referrerData = ref<MetricsData[]>([])
+
+const languageType = ref<'language' | 'timezone'>('language')
+const languageData = ref<MetricsData[]>([])
+
+const deviceType = ref<'device_type' | 'brand' | 'device'>('device')
+const deviceData = ref<MetricsData[]>([])
+
+const platformType = ref<'os' | 'browser'>('os')
+const platformData = ref<MetricsData[]>([])
+
+const currentLink = ref<Link | null>(null)
+
+const shortUrlParam = computed(() => {
+  const url = currentLink.value?.shortUrl
+  return url ? url.split('/').pop() : undefined
+})
+
+onMounted(async () => {
+  currentLink.value = await linksStore.fetchLink(route.params.id as string)
+  if (shortUrlParam.value && analysisStore.timeRange) {
+    await fetchAll()
+  }
+})
+
+const fetchAll = async () => {
+  const [basic, timeseries, location, referrer, language, device, platform] = await Promise.all([
+    analysisStore.getBasicData(shortUrlParam.value),
+    analysisStore.getTimeseriesData(shortUrlParam.value),
+    analysisStore.getLocationData(locationType.value, shortUrlParam.value),
+    analysisStore.getMetricsData(referrerType.value, shortUrlParam.value),
+    analysisStore.getMetricsData(languageType.value, shortUrlParam.value),
+    analysisStore.getMetricsData(deviceType.value, shortUrlParam.value),
+    analysisStore.getMetricsData(platformType.value, shortUrlParam.value),
+  ])
+
+  basicData.value = basic?.data || null
+  timeseriesData.value = timeseries?.data || []
+  locationData.value = location?.data || []
+  countryData.value = locationData.value
+  referrerData.value = referrer?.data || []
+  languageData.value = language?.data || []
+  deviceData.value = device?.data || []
+  platformData.value = platform?.data || []
 }
+
+const timeRange = computed(() => analysisStore.timeRange)
+
+watch(timeRange, async () => {
+  if (shortUrlParam.value) {
+    await fetchAll()
+  }
+})
+
+watch(locationType, async () => {
+  if (shortUrlParam.value) {
+    const res = await analysisStore.getLocationData(locationType.value, shortUrlParam.value)
+    locationData.value = res?.data || []
+  }
+})
+
+watch(referrerType, async () => {
+  if (shortUrlParam.value) {
+    const res = await analysisStore.getMetricsData(referrerType.value, shortUrlParam.value)
+    referrerData.value = res?.data || []
+  }
+})
+
+watch(languageType, async () => {
+  if (shortUrlParam.value) {
+    const res = await analysisStore.getMetricsData(languageType.value, shortUrlParam.value)
+    languageData.value = res?.data || []
+  }
+})
+
+watch(deviceType, async () => {
+  if (shortUrlParam.value) {
+    const res = await analysisStore.getMetricsData(deviceType.value, shortUrlParam.value)
+    deviceData.value = res?.data || []
+  }
+})
+
+watch(platformType, async () => {
+  if (shortUrlParam.value) {
+    const res = await analysisStore.getMetricsData(platformType.value, shortUrlParam.value)
+    platformData.value = res?.data || []
+  }
+})
 
 const iconColor = '#00b09b'
 
 const linkStats = computed(() => [
   {
     label: '访问次数',
-    value: currentLink.value?.visits || 0,
+    value: basicData.value?.visits || 0,
     icon: EyeOutline,
   },
   {
     label: '访问人数',
-    value: currentLink.value?.visitors || 0,
+    value: basicData.value?.visitors || 0,
     icon: PeopleOutline,
   },
   {
     label: '引用来源',
-    value: currentLink.value?.referers || 0,
+    value: basicData.value?.referers || 0,
     icon: LinkOutline,
   },
 ])
 
-// 更新统计数据
-const updateAnalytics = async (start: number, end: number) => {
-  try {
-    await linksStore.fetchLinkDetails(route.params.id as string, {
-      startTime: start,
-      endTime: end,
-    })
-  } catch (error) {
-    message.error('获取链接详情失败')
-    console.error('Failed to fetch link details:', error)
-  }
-}
-
-// 来源分析数据
-const sourceTabs = [
+const locationTabs = [
   {
-    key: 'source',
-    label: '访问来源',
+    key: 'country',
+    label: '国家',
+  },
+  {
+    key: 'region',
+    label: '地区',
+  },
+  {
+    key: 'city',
+    label: '城市',
   },
 ]
 
-const sourceData = [
-  { name: '直接访问', value: 500 },
-  { name: '搜索引擎', value: 300 },
-  { name: '社交媒体', value: 200 },
+const referrerTabs = [
+  {
+    key: 'referer',
+    label: '来源',
+  },
+  {
+    key: 'referer_type',
+    label: '类型',
+  },
 ]
 
-// 语言分析数据
 const languageTabs = [
   {
     key: 'language',
-    label: '使用语言',
+    label: '语言',
   },
   {
     key: 'timezone',
-    label: '时区分布',
+    label: '时区',
   },
 ]
 
-const languageData = [
-  { name: '简体中文', value: 800 },
-  { name: '英语', value: 400 },
-  { name: '日语', value: 200 },
-]
-
-// 设备分析数据
 const deviceTabs = [
   {
-    key: 'type',
-    label: '设备类型',
+    key: 'device',
+    label: '型号',
   },
+
   {
     key: 'brand',
-    label: '设备品牌',
+    label: '品牌',
   },
   {
-    key: 'model',
-    label: '设备型号',
+    key: 'device_type',
+    label: '类型',
   },
 ]
 
-const deviceData = [
-  { name: '手机', value: 1000 },
-  { name: '平板', value: 300 },
-  { name: '笔记本', value: 500 },
-]
-
-// 平台分析数据
 const platformTabs = [
   {
     key: 'os',
@@ -195,11 +286,17 @@ const platformTabs = [
   },
 ]
 
-const platformData = [
-  { name: 'iOS', value: 800 },
-  { name: 'Android', value: 600 },
-  { name: 'Windows', value: 400 },
-]
+const copied = ref(false)
+
+const copyToClipboard = () => {
+  navigator.clipboard.writeText(currentLink.value?.shortUrl!).then(() => {
+    copied.value = true
+    setTimeout(() => {
+      copied.value = false
+    }, 5000)
+    message.success('短链接已复制到剪贴板')
+  })
+}
 </script>
 
 <style scoped>
@@ -216,5 +313,11 @@ const platformData = [
   background-color: var(--n-color-checkable);
   padding: 0px;
   margin: 0px 0px 0px 10px;
+}
+
+:deep(.n-card) {
+  border-radius: 8px;
+  height: 100%;
+  transition: all 0.3s ease;
 }
 </style>

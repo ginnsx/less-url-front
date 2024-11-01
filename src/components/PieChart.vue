@@ -7,16 +7,12 @@ import { onMounted, ref, watch, computed } from 'vue'
 import * as echarts from 'echarts'
 import type { ECharts } from 'echarts'
 import { useThemesStore } from '@/stores/themes'
+import type { MetricsData } from '@/types'
 
 const themesStore = useThemesStore()
 
-interface DataItem {
-  name: string
-  value: number
-}
-
 interface Props {
-  data: DataItem[]
+  data: MetricsData[]
   theme?: string
   height: number
 }

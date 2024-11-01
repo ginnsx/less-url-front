@@ -12,11 +12,7 @@
 import { ref } from 'vue'
 import { NCard, NTabs, NTabPane } from 'naive-ui'
 import MetricsVisualization from '@/components/MetricsVisualization.vue'
-
-interface DataItem {
-  name: string
-  value: number
-}
+import type { MetricsData } from '@/types'
 
 interface TabItem {
   key: string
@@ -26,7 +22,7 @@ interface TabItem {
 interface Props {
   title: string
   tabs: TabItem[]
-  data: DataItem[]
+  data: MetricsData[]
 }
 
 const props = defineProps<Props>()

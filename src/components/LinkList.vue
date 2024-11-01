@@ -49,7 +49,7 @@ import type { Link, SortParams } from '@/types'
 import { storeToRefs } from 'pinia'
 
 const linksStore = useLinksStore()
-const { links, loading, currentPage, pageSize, totalPages } = storeToRefs(linksStore)
+const { links, loading, currentPage, pageSize, total, totalPages } = storeToRefs(linksStore)
 const message = useMessage()
 const tableRef = useTemplateRef<DataTableInst>('table')
 
@@ -201,6 +201,7 @@ const pagination = computed<PaginationProps>(() => ({
   page: currentPage.value,
   pageCount: totalPages.value,
   pageSize: pageSize.value,
+  itemCount: total.value,
   showSizePicker: true,
   pageSizes: [10, 20, 50],
   prefix: ({ itemCount }) => `共 ${itemCount} 条`,

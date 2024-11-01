@@ -19,10 +19,10 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import { NProgress } from 'naive-ui'
-import type { DataItem } from '@/types'
+import type { MetricsData } from '@/types'
 
 interface Props {
-  data: DataItem[]
+  data: MetricsData[]
   color?: string
 }
 
@@ -56,7 +56,7 @@ const processedData = computed(() => {
 }
 
 .progress-bar:hover {
-  transform: scale(1.05);
+  transform: scale(1.03);
 }
 
 .progress-label {

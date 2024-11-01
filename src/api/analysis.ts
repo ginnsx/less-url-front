@@ -1,37 +1,47 @@
 import { api } from './axiosWrapper'
-// import type { AnalyticsData, TimeRange } from '@/types'
-
-export interface AnalyticsData {
-  visits: number
-  uniqueVisitors: number
-  avgDuration: number
-  bounceRate: number
-}
-
-export interface TimeRange {
-  start: number
-  end: number
-}
+import type {
+  BasicData,
+  TimeRange,
+  TimeseriesData,
+  LocationData,
+  MetricsData,
+  MetricsType,
+} from '@/types'
 
 export const analysisApi = {
-  getAnalytics: async (linkId: string, timeRange: TimeRange) => {
-    return api.get<AnalyticsData>(`/analytics/${linkId}`, {
+  getBasicData: async (timeRange: TimeRange, shortUrl?: string) => {
+    return api.get<BasicData>(`/statistics/basic`, {
       startTime: timeRange.start,
       endTime: timeRange.end,
+      shortUrl,
     })
   },
-
-  getVisitTrends: async (linkId: string, timeRange: TimeRange) => {
-    return api.get(`/analytics/${linkId}/trends`, {
+  getTimeseriesData: async (type: 'day' | 'hour', timeRange: TimeRange, shortUrl?: string) => {
+    return api.get<TimeseriesData[]>(`/statistics/timeseries`, {
+      type,
       startTime: timeRange.start,
       endTime: timeRange.end,
+      shortUrl,
     })
   },
-
-  getGeoDistribution: async (linkId: string, timeRange: TimeRange) => {
-    return api.get(`/analytics/${linkId}/geo`, {
+  getLocationData: async (
+    type: 'country' | 'region' | 'city',
+    timeRange: TimeRange,
+    shortUrl?: string
+  ) => {
+    return api.get<LocationData[]>(`/statistics/locations`, {
+      type,
       startTime: timeRange.start,
       endTime: timeRange.end,
+      shortUrl,
+    })
+  },
+  getMetricsData: async (type: MetricsType, timeRange: TimeRange, shortUrl?: string) => {
+    return api.get<MetricsData[]>(`/statistics/metrics`, {
+      type,
+      startTime: timeRange.start,
+      endTime: timeRange.end,
+      shortUrl,
     })
   },
 }

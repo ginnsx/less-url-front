@@ -47,6 +47,16 @@ export const useLinksStore = defineStore('links', {
       }
     },
 
+    async fetchLink(id: string) {
+      try {
+        const response = await linksApi.getLink(id)
+        return response.data
+      } catch (error) {
+        console.error('Failed to fetch link:', error)
+        return null
+      }
+    },
+
     async fetchRecentLinks() {
       try {
         const response = await linksApi.getLinks({

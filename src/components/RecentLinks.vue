@@ -196,8 +196,8 @@ const copyToClipboard = (text: string) => {
 
 const router = useRouter()
 
-const goToAnalytics = (linkId: string) => {
-  router.push({ path: `/analytics/${linkId}` })
+const goToAnalytics = (id: string) => {
+  router.push({ path: `/analytics/${id}` })
 }
 </script>
 
