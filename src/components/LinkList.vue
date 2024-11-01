@@ -127,6 +127,7 @@ const columns = computed<DataTableColumns<Link>>(() => [
   {
     title: '创建日期',
     key: 'createdAt',
+    defaultSortOrder: 'descend',
     sorter: true,
     render(row: Link) {
       return row.createdAt ? formatDateTime(row.createdAt) : '--'
@@ -208,7 +209,7 @@ const pagination = computed<PaginationProps>(() => ({
 
 const filterParams = ref<Record<string, any>>({})
 
-const sorters = ref<SortParams>({})
+const sorters = ref<SortParams>({ createdAt: 'desc' })
 
 const hasSorter = computed(() => Object.keys(sorters.value).length > 0)
 
