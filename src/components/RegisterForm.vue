@@ -21,7 +21,7 @@
         @update:value="checkEmail"
       />
     </n-form-item>
-    <n-form-item path="verifyCode" v-if="emailCheckStatus === 'valid'">
+    <n-form-item path="verifyCode">
       <n-input-group>
         <n-input
           v-model:value="model.verifyCode"
@@ -41,15 +41,7 @@
       </n-input-group>
     </n-form-item>
     <template v-if="step === 1">
-      <n-button
-        v-if="isVerifyCodeValid"
-        type="primary"
-        @click="verifyEmail"
-        :loading="isLoading"
-        block
-      >
-        验证邮箱
-      </n-button>
+      <n-button type="primary" @click="verifyEmail" :loading="isLoading" block> 验证邮箱 </n-button>
     </template>
     <template v-else>
       <n-form-item path="nickname">
@@ -119,6 +111,7 @@ import {
 } from 'naive-ui'
 import type { FormInst, FormRules } from 'naive-ui'
 import { useAuthStore } from '@/stores/auth'
+import { debounce } from 'lodash-es'
 
 const emit = defineEmits(['register-success', 'login-success'])
 
@@ -147,10 +140,6 @@ const emailValidateStatus = computed(() => {
   if (emailCheckStatus.value === 'error') return 'warning'
   if (emailCheckStatus.value === 'valid') return 'success'
   return undefined
-})
-
-const isVerifyCodeValid = computed(() => {
-  return model.verifyCode.length === 6
 })
 
 const rules: FormRules = {
@@ -194,7 +183,7 @@ const rules: FormRules = {
   ],
 }
 
-const checkEmail = async (value: string) => {
+const doCheckEmail = async (value: string) => {
   emailCheckStatus.value = 'unchecked'
   emailFeedback.value = ''
   formRef.value?.validate(
@@ -219,6 +208,8 @@ const checkEmail = async (value: string) => {
     (rule) => rule?.key === 'email'
   )
 }
+
+const checkEmail = debounce(doCheckEmail, 1000)
 
 const handleGetVerifyCode = async () => {
   isGettingCode.value = true
@@ -269,7 +260,7 @@ const passwordStrengthStatus = computed(() => {
   return 'info'
 })
 
-const checkPasswordStrength = (password: string) => {
+const doCheckPasswordStrength = (password: string) => {
   const hasLowerCase = /[a-z]/.test(password)
   const hasUpperCase = /[A-Z]/.test(password)
   const hasNumber = /\d/.test(password)
@@ -302,6 +293,8 @@ const checkPasswordStrength = (password: string) => {
   // 确保分数在0-100之间
   passwordStrength.value = Math.min(Math.max(strength, 0), 100) + 10
 }
+
+const checkPasswordStrength = debounce(doCheckPasswordStrength, 1000)
 
 const verifyEmail = (e: MouseEvent | KeyboardEvent) => {
   e.preventDefault()

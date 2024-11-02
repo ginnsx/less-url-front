@@ -47,7 +47,10 @@
       </n-input-group>
     </n-form-item>
     <n-flex vertical :size="12">
-      <n-checkbox v-model:checked="useVerifyCode">使用验证码登录</n-checkbox>
+      <n-flex justify="space-between" align="center">
+        <n-checkbox v-model:checked="useVerifyCode">使用验证码登录</n-checkbox>
+        <n-button text type="primary" @click="handleForgotPassword">忘记密码？</n-button>
+      </n-flex>
       <n-button type="primary" @click="handleSubmit" :loading="isLoading" block> 登录 </n-button>
     </n-flex>
   </n-form>
@@ -68,6 +71,7 @@ import {
 } from 'naive-ui'
 import type { FormInst, FormRules } from 'naive-ui'
 import { useAuthStore } from '@/stores/auth'
+import { debounce } from 'lodash-es'
 
 const emit = defineEmits(['login-success'])
 
@@ -126,7 +130,7 @@ const options = computed(() => {
   })
 })
 
-const checkEmail = async (value: string) => {
+const doCheckEmail = async (value: string) => {
   emailCheckStatus.value = 'unchecked'
   emailFeedback.value = ''
   model.verifyCode = ''
@@ -154,6 +158,8 @@ const checkEmail = async (value: string) => {
     (rule) => rule?.key === 'username'
   )
 }
+
+const checkEmail = debounce(doCheckEmail, 1000)
 
 const handleGetVerifyCode = async () => {
   isGettingCode.value = true
@@ -198,6 +204,11 @@ const handleSubmit = (e: MouseEvent | KeyboardEvent) => {
       isLoading.value = false
     }
   })
+}
+
+const handleForgotPassword = () => {
+  // 实现忘记密码的逻辑
+  message.info('忘记密码功能开发中...')
 }
 </script>
 

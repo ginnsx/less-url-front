@@ -21,6 +21,6 @@ pinia.use(piniaPluginPersistedstate)
 app.use(pinia)
 
 // 初始化 guest id
-await setupGuestStore()
+setupGuestStore()
 
 app.mount('#app')

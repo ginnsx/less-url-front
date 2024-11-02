@@ -42,11 +42,14 @@ export const useGuestStore = defineStore('guest', {
   persist: false, // 不使用 pinia-persistence，因为我们手动管理加密的 localStorage
 })
 
-export async function setupGuestStore() {
+export function setupGuestStore() {
   const guestStore = useGuestStore()
-  try {
-    await guestStore.initGuestId()
-  } catch (error) {
-    console.error('Failed to setup guest store:', error)
-  }
+  guestStore
+    .initGuestId()
+    .then(() => {
+      console.log('Guest store initialized')
+    })
+    .catch((error) => {
+      console.error('Failed to setup guest store:', error)
+    })
 }
