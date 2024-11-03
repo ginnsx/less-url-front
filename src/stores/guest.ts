@@ -26,9 +26,9 @@ export const useGuestStore = defineStore('guest', {
       if (storedGuestId) {
         this.guestId = await decryptData(storedGuestId)
       } else {
-        const { data } = await guestApi.fetchGuestId()
-        this.guestId = data.guestId
-        const encryptedGuestId = await encryptData(data.guestId)
+        const result = await guestApi.fetchGuestId()
+        this.guestId = result.guestId
+        const encryptedGuestId = await encryptData(result.guestId)
         localStorage.setItem('encryptedGuestId', encryptedGuestId)
       }
     },

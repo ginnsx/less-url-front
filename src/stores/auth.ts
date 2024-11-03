@@ -49,8 +49,8 @@ export const useAuthStore = defineStore('auth', {
 
     async checkEmail(email: string) {
       try {
-        const response = await authApi.checkEmail(email)
-        return response.data.exists
+        const result = await authApi.checkEmail(email)
+        return result.exist
       } catch (error) {
         console.error('Failed to check email:', error)
         return false
@@ -71,11 +71,11 @@ export const useAuthStore = defineStore('auth', {
 
     async login(email: string, password?: string, verifyCode?: string) {
       try {
-        const response = await authApi.login(email, password, verifyCode)
+        const result = await authApi.login(email, password, verifyCode)
         this.setTokenPair({
-          accessToken: response.data.access_token,
-          refreshToken: response.data.refresh_token,
-          expiresIn: Date.now() + response.data.expires_in * 1000,
+          accessToken: result.access_token,
+          refreshToken: result.refresh_token,
+          expiresIn: Date.now() + result.expires_in * 1000,
         })
         await this.fetchUserInfo()
 
@@ -113,14 +113,14 @@ export const useAuthStore = defineStore('auth', {
         return true
       } catch (error) {
         console.error('Failed to send verification code:', error)
-        return (error as any).response.data.detail || '发送验证码失败'
+        return '发送验证码失败'
       }
     },
 
     async fetchUserInfo() {
       try {
-        const response = await authApi.getUserInfo()
-        this.user = response.data
+        const result = await authApi.getUserInfo()
+        this.user = result
       } catch (error) {
         console.error('Failed to fetch user info:', error)
         window['$message'].error('获取用户信息失败')
@@ -152,10 +152,10 @@ export const useAuthStore = defineStore('auth', {
 
     async migrateGuestData(guestId: string) {
       try {
-        const response = await authApi.migrateGuestData(guestId)
+        const result = await authApi.migrateGuestData(guestId)
         window['$notification'].success({
           title: '合并本地数据',
-          content: `成功合并 ${response.data.links} 条链接记录`,
+          content: `成功合并 ${result.links} 条链接记录`,
         })
         return true
       } catch (error) {

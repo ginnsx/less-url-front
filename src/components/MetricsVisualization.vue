@@ -1,7 +1,7 @@
 <template>
   <div>
     <n-flex vertical align="stretch">
-      <div flex="1" style="height: 300px">
+      <div flex="1" style="height: 350px">
         <ProgressList :data="limitedData" />
         <div class="view-more" v-if="data.length > 5">
           <n-button text type="default" @click="showDetailsModal = true" class="view-more-btn">

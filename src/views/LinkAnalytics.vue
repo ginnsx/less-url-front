@@ -158,14 +158,14 @@ const fetchAll = async () => {
     analysisStore.getMetricsData(platformType.value, shortUrlParam.value),
   ])
 
-  basicData.value = basic?.data || null
-  timeseriesData.value = timeseries?.data || []
-  locationData.value = location?.data || []
+  basicData.value = basic || null
+  timeseriesData.value = timeseries || []
+  locationData.value = location || []
   countryData.value = locationData.value
-  referrerData.value = referrer?.data || []
-  languageData.value = language?.data || []
-  deviceData.value = device?.data || []
-  platformData.value = platform?.data || []
+  referrerData.value = referrer || []
+  languageData.value = language || []
+  deviceData.value = device || []
+  platformData.value = platform || []
 
   // 以第一次加载的数据决定是否显示，后续修改 tab 不会导致组件消失
   displayOptions.value = {
@@ -204,36 +204,36 @@ watch(timeRange, async () => {
 
 watch(locationType, async () => {
   if (shortUrlParam.value) {
-    const res = await analysisStore.getLocationData(locationType.value, shortUrlParam.value)
-    locationData.value = res?.data || []
+    const result = await analysisStore.getLocationData(locationType.value, shortUrlParam.value)
+    locationData.value = result || []
   }
 })
 
 watch(referrerType, async () => {
   if (shortUrlParam.value) {
-    const res = await analysisStore.getMetricsData(referrerType.value, shortUrlParam.value)
-    referrerData.value = res?.data || []
+    const result = await analysisStore.getMetricsData(referrerType.value, shortUrlParam.value)
+    referrerData.value = result || []
   }
 })
 
 watch(languageType, async () => {
   if (shortUrlParam.value) {
-    const res = await analysisStore.getMetricsData(languageType.value, shortUrlParam.value)
-    languageData.value = res?.data || []
+    const result = await analysisStore.getMetricsData(languageType.value, shortUrlParam.value)
+    languageData.value = result || []
   }
 })
 
 watch(deviceType, async () => {
   if (shortUrlParam.value) {
-    const res = await analysisStore.getMetricsData(deviceType.value, shortUrlParam.value)
-    deviceData.value = res?.data || []
+    const result = await analysisStore.getMetricsData(deviceType.value, shortUrlParam.value)
+    deviceData.value = result || []
   }
 })
 
 watch(platformType, async () => {
   if (shortUrlParam.value) {
-    const res = await analysisStore.getMetricsData(platformType.value, shortUrlParam.value)
-    platformData.value = res?.data || []
+    const result = await analysisStore.getMetricsData(platformType.value, shortUrlParam.value)
+    platformData.value = result || []
   }
 })
 

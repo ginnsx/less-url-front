@@ -63,6 +63,21 @@ export default [
     },
   },
 
+  {
+    url: '/api/v1/links/counts',
+    method: 'get',
+    response: (opt: any) => {
+      const ownerId = getOwnerIdFromRequest(opt)
+
+      const ownerLinks = linksWithAnalytics.filter((l) => l.link.ownerId === ownerId)
+      const counts = ownerLinks.reduce((acc, curr) => {
+        return acc + curr.visits.length
+      }, 0)
+
+      return createResponse({ links: ownerLinks.length, analytics: counts })
+    },
+  },
+
   // Get single link
   {
     url: '/api/v1/links/:id',
@@ -108,21 +123,6 @@ export default [
       })
 
       return createResponse(newLink)
-    },
-  },
-
-  {
-    url: '/api/v1/links/counts',
-    method: 'get',
-    response: (opt: any) => {
-      const ownerId = getOwnerIdFromRequest(opt)
-
-      const ownerLinks = linksWithAnalytics.filter((l) => l.link.ownerId === ownerId)
-      const counts = ownerLinks.reduce((acc, curr) => {
-        return acc + curr.visits.length
-      }, 0)
-
-      return createResponse({ links: ownerLinks.length, analytics: counts })
     },
   },
 

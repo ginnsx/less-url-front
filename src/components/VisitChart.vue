@@ -5,7 +5,7 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, ref, computed } from 'vue'
+import { onMounted, ref, computed, watch, onUnmounted } from 'vue'
 import * as echarts from 'echarts'
 import { NCard } from 'naive-ui'
 import dayjs from 'dayjs'
@@ -22,6 +22,7 @@ const analysisStore = useAnalysisStore()
 const themesStore = useThemesStore()
 
 const chartRef = ref<HTMLElement>()
+const chart = ref<echarts.ECharts>()
 
 const timeseriesData = computed(() => props.data)
 
@@ -29,10 +30,10 @@ const themeName = computed(() => themesStore.themeName)
 
 const isDay = computed(() => analysisStore.timeUnitType === 'day')
 
-onMounted(() => {
-  const chart = echarts.init(chartRef.value!, themeName.value)
+const updateChart = () => {
+  if (!chart.value) return
 
-  chart.setOption({
+  chart.value.setOption({
     backgroundColor: 'transparent',
     grid: {
       left: '3%',
@@ -87,5 +88,32 @@ onMounted(() => {
       },
     ],
   })
+}
+
+onMounted(() => {
+  chart.value = echarts.init(chartRef.value!, themeName.value)
+  updateChart()
+})
+
+watch(
+  () => props.data,
+  () => {
+    updateChart()
+  },
+  { deep: true }
+)
+
+watch(themeName, (newTheme) => {
+  if (chart.value) {
+    chart.value.dispose()
+    chart.value = echarts.init(chartRef.value!, newTheme)
+    updateChart()
+  }
+})
+
+onUnmounted(() => {
+  if (chart.value) {
+    chart.value.dispose()
+  }
 })
 </script>

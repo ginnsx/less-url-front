@@ -19,9 +19,9 @@ export const useLinksStore = defineStore('links', {
       expiresAt?: number
     }): Promise<Link | null> {
       try {
-        const response = await linksApi.createLink(data)
+        const result = await linksApi.createLink(data)
         await this.fetchRecentLinks() // 刷新列表
-        return response.data
+        return result
       } catch (error) {
         console.error('Failed to create link:', error)
         return null
@@ -31,14 +31,14 @@ export const useLinksStore = defineStore('links', {
     async fetchLinks(params: QueryParams = {}) {
       this.loading = true
       try {
-        const response = await linksApi.getLinks({
+        const result = await linksApi.getLinks({
           page: this.currentPage,
           size: this.pageSize,
           ...params,
         })
-        this.links = response.data.records ?? []
-        this.total = response.data.total ?? 0
-        this.totalPages = response.data.pages ?? 0
+        this.links = result.records ?? []
+        this.total = result.total ?? 0
+        this.totalPages = result.pages ?? 0
       } catch (error) {
         console.error('Failed to fetch links:', error)
         window['$message'].error('获取链接列表失败')
@@ -49,8 +49,8 @@ export const useLinksStore = defineStore('links', {
 
     async fetchLink(id: string) {
       try {
-        const response = await linksApi.getLink(id)
-        return response.data
+        const result = await linksApi.getLink(id)
+        return result
       } catch (error) {
         console.error('Failed to fetch link:', error)
         return null
@@ -97,8 +97,8 @@ export const useLinksStore = defineStore('links', {
       params: { requiredGuest?: boolean; requiredJWT?: boolean } = {}
     ): Promise<LinkDataCounts> {
       try {
-        const { data } = await linksApi.countLinks(params)
-        return data
+        const result = await linksApi.countLinks(params)
+        return result
       } catch (error) {
         console.error('Failed to count links:', error)
         return { links: 0, analytics: 0 }
@@ -107,12 +107,12 @@ export const useLinksStore = defineStore('links', {
 
     async fetchLatestLink() {
       try {
-        const response = await linksApi.getLinks({
+        const result = await linksApi.getLinks({
           page: 1,
           size: 1,
           sort: { created_at: 'desc' },
         })
-        return response.data.records[0]
+        return result.records[0]
       } catch (error) {
         console.error('Failed to fetch latest link:', error)
         return null

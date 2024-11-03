@@ -1,4 +1,4 @@
-import axios, { type AxiosInstance, type AxiosRequestConfig, type AxiosResponse } from 'axios'
+import axios, { type AxiosInstance, type AxiosRequestConfig } from 'axios'
 import { useAuthStore } from '@/stores/auth'
 import { useGuestStore } from '@/stores/guest'
 import type { TokenPair, QueryParams, AxiosWrapperConfig, AxiosWrapperRequestConfig } from '@/types'
@@ -27,9 +27,23 @@ class AxiosWrapper {
       (error) => Promise.reject(error)
     )
 
-    // 响应拦截器：处理令牌过期
+    // 响应拦截器：处理令牌过期，拆包
     this.instance.interceptors.response.use(
-      (response) => response,
+      (response) => {
+        const data = response.data
+
+        // 检查是否符合 ApiResponse 接口结构
+        if (data && 'code' in data && 'msg' in data && 'data' in data) {
+          if (data.code !== 1) {
+            // 当 code 不为 1 时抛出错误
+            throw new Error(data.msg || '请求失败')
+          }
+          return data.data
+        }
+
+        // 如果不符合特定结构，直接返回数据
+        return data
+      },
       async (error) => {
         if (error.response?.status === 401) {
           const authStore = useAuthStore()
@@ -147,12 +161,12 @@ class AxiosWrapper {
     url: string,
     params: QueryParams = {},
     config: AxiosWrapperRequestConfig = {}
-  ): Promise<AxiosResponse<T>> {
+  ): Promise<T> {
     const transformedParams = this.transformQueryParams(params)
     return this.instance.get<T>(url, {
       ...config,
       params: transformedParams,
-    })
+    }) as Promise<T>
   }
 
   // POST 请求方法
@@ -160,8 +174,8 @@ class AxiosWrapper {
     url: string,
     data?: any,
     config: AxiosWrapperRequestConfig = {}
-  ): Promise<AxiosResponse<T>> {
-    return this.instance.post<T>(url, data, config)
+  ): Promise<T> {
+    return this.instance.post<T>(url, data, config) as Promise<T>
   }
 
   // PUT 请求方法
@@ -169,16 +183,13 @@ class AxiosWrapper {
     url: string,
     data?: any,
     config: AxiosWrapperRequestConfig = {}
-  ): Promise<AxiosResponse<T>> {
-    return this.instance.put<T>(url, data, config)
+  ): Promise<T> {
+    return this.instance.put<T>(url, data, config) as Promise<T>
   }
 
   // DELETE 请求方法
-  public async delete<T = any>(
-    url: string,
-    config: AxiosWrapperRequestConfig = {}
-  ): Promise<AxiosResponse<T>> {
-    return this.instance.delete<T>(url, config)
+  public async delete<T = any>(url: string, config: AxiosWrapperRequestConfig = {}): Promise<T> {
+    return this.instance.delete<T>(url, config) as Promise<T>
   }
 }
 

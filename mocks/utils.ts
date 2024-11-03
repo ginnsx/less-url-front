@@ -1,4 +1,4 @@
-export function createResponse<T>(data: T, code = 200, message = 'success') {
+export function createResponse<T>(data: T, code = 1, message = 'success') {
   return {
     code,
     data,

@@ -1,7 +1,7 @@
 import type { MockMethod } from 'vite-plugin-mock'
 import { createResponse } from './utils'
-import type { BasicData, TimeseriesData } from '@/types'
-import { getVisitsByShortUrl, getMetricsData } from './data'
+import type { BasicData } from '@/types'
+import { getVisitsInTimeRange, getMetricsData } from './data'
 import type { VisitRecord } from './data/types'
 
 // Generate timeseries data
@@ -11,34 +11,35 @@ const generateTimeseriesData = (
   endTime: number,
   type: 'day' | 'hour'
 ) => {
-  const timeseriesData: TimeseriesData[] = []
   const interval = type === 'day' ? 24 * 60 * 60 * 1000 : 60 * 60 * 1000
 
-  // Group visits by time interval
-  const visitsByTime: Record<number, { visits: number; uniqueIps: Set<string> }> = {}
+  // 确保开始时间和结束时间对齐到间隔边界
+  const alignedStartTime = Math.floor(startTime / interval) * interval
+  const alignedEndTime = Math.ceil(endTime / interval) * interval
 
-  for (let time = startTime; time <= endTime; time += interval) {
+  // 初始化时间序列数据结构
+  const visitsByTime: Record<number, { visits: number; uniqueIps: Set<string> }> = {}
+  for (let time = alignedStartTime; time <= alignedEndTime; time += interval) {
     visitsByTime[time] = { visits: 0, uniqueIps: new Set() }
   }
 
+  // 对齐访问记录到正确的时间间隔
   visits.forEach((visit) => {
     const timeKey = Math.floor(visit.timestamp / interval) * interval
-    if (visitsByTime[timeKey]) {
+    if (timeKey >= alignedStartTime && timeKey <= alignedEndTime) {
       visitsByTime[timeKey].visits++
       visitsByTime[timeKey].uniqueIps.add(`${visit.country}-${visit.city}-${visit.device}`)
     }
   })
 
-  Object.entries(visitsByTime).forEach(([time, data]) => {
-    const timeseriesEntry: TimeseriesData = {
+  // 确保时间序列按时间排序
+  return Object.entries(visitsByTime)
+    .sort(([timeA], [timeB]) => Number(timeA) - Number(timeB))
+    .map(([time, data]) => ({
       time: Number(time),
       visits: data.visits,
       visitors: data.uniqueIps.size,
-    }
-    timeseriesData.push(timeseriesEntry)
-  })
-
-  return timeseriesData
+    }))
 }
 
 export default [
@@ -47,8 +48,8 @@ export default [
     url: '/api/v1/statistics/basic',
     method: 'get',
     response: (req: any) => {
-      const { shortUrl, startTime = 0, endTime = Date.now() } = req.query
-      const visits = getVisitsByShortUrl(shortUrl, Number(startTime), Number(endTime))
+      const { startTime = 0, endTime = Date.now() } = req.query
+      const visits = getVisitsInTimeRange(Number(startTime), Number(endTime))
 
       const uniqueVisitors = new Set(visits.map((v) => `${v.country}-${v.city}-${v.device}`)).size
 
@@ -69,8 +70,8 @@ export default [
     url: '/api/v1/statistics/timeseries',
     method: 'get',
     response: (req: any) => {
-      const { shortUrl, type, startTime, endTime } = req.query
-      const visits = getVisitsByShortUrl(shortUrl, Number(startTime), Number(endTime))
+      const { type, startTime, endTime } = req.query
+      const visits = getVisitsInTimeRange(Number(startTime), Number(endTime))
       const data = generateTimeseriesData(visits, Number(startTime), Number(endTime), type)
       return createResponse(data)
     },
@@ -81,23 +82,47 @@ export default [
     url: '/api/v1/statistics/locations',
     method: 'get',
     response: (req: any) => {
-      const { shortUrl, type, startTime, endTime } = req.query
-      const visits = getVisitsByShortUrl(shortUrl, Number(startTime), Number(endTime))
+      const { type = 'country', startTime, endTime } = req.query
+      const visits = getVisitsInTimeRange(Number(startTime), Number(endTime))
 
-      const locationMap: Record<string, number> = {}
-      const totalVisits = visits.length
+      const locationMap: Record<
+        string,
+        {
+          country: string
+          region?: string
+          city?: string
+          value: number
+        }
+      > = {}
 
       visits.forEach((visit) => {
-        const location = visit[type as 'country' | 'region' | 'city']
-        locationMap[location] = (locationMap[location] || 0) + 1
+        let key: string
+        switch (type) {
+          case 'country':
+            key = visit.country
+            break
+          case 'region':
+            key = `${visit.country}-${visit.region}`
+            break
+          case 'city':
+            key = `${visit.country}-${visit.region}-${visit.city}`
+            break
+          default:
+            key = visit.country
+        }
+
+        if (!locationMap[key]) {
+          locationMap[key] = {
+            country: visit.country,
+            region: type === 'country' ? undefined : visit.region,
+            city: type === 'city' ? visit.city : undefined,
+            value: 0,
+          }
+        }
+        locationMap[key].value += 1
       })
 
-      const data = Object.entries(locationMap).map(([name, visits]) => ({
-        name,
-        visits,
-        percentage: (visits / totalVisits) * 100,
-      }))
-
+      const data = Object.values(locationMap).sort((a, b) => b.value - a.value)
       return createResponse(data)
     },
   },
@@ -107,8 +132,8 @@ export default [
     url: '/api/v1/statistics/metrics',
     method: 'get',
     response: (req: any) => {
-      const { shortUrl, type, startTime, endTime } = req.query
-      const visits = getVisitsByShortUrl(shortUrl, Number(startTime), Number(endTime))
+      const { type, startTime, endTime } = req.query
+      const visits = getVisitsInTimeRange(Number(startTime), Number(endTime))
       const data = getMetricsData(type, visits)
       return createResponse(data)
     },
