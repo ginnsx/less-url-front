@@ -9,7 +9,7 @@
   >
     <n-form-item path="email" :feedback="emailFeedback" :validation-status="emailValidateStatus">
       <n-auto-complete
-        v-model:value="model.email"
+        v-model:value.trim="model.email"
         :options="options"
         :get-show="(value: string) => value.endsWith('@')"
         :input-props="{
@@ -46,7 +46,7 @@
     <template v-else>
       <n-form-item path="nickname">
         <n-input
-          v-model:value="model.nickname"
+          v-model:value.trim="model.nickname"
           :input-props="{
             autocomplete: 'disabled',
           }"
@@ -190,8 +190,8 @@ const doCheckEmail = async (value: string) => {
     async (errors) => {
       if (!errors) {
         try {
-          const exist = await authStore.checkEmail(value)
-          if (exist) {
+          const exists = await authStore.checkEmail(value.trim())
+          if (exists) {
             emailFeedback.value = '该邮箱已被注册'
             emailCheckStatus.value = 'invalid'
           } else {

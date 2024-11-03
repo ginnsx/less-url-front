@@ -1,0 +1,22 @@
+{
+  "Apple": {
+    "phone": ["iPhone 13", "iPhone 14", "iPhone 15", "iPhone 15 Pro", "iPhone 15 Pro Max"],
+    "tablet": ["iPad Air", "iPad Pro 11", "iPad Pro 12.9", "iPad mini"],
+    "laptop": ["MacBook Air", "MacBook Pro 13", "MacBook Pro 14", "MacBook Pro 16"]
+  },
+  "Samsung": {
+    "phone": ["Galaxy S23", "Galaxy S23+", "Galaxy S23 Ultra", "Galaxy A54", "Galaxy Z Fold5"],
+    "tablet": ["Galaxy Tab S9", "Galaxy Tab S9+", "Galaxy Tab A8"],
+    "laptop": ["Galaxy Book3", "Galaxy Book3 Pro", "Galaxy Book3 360"]
+  },
+  "Xiaomi": {
+    "phone": ["Redmi Note 12", "Xiaomi 13", "POCO F5", "Xiaomi 13T Pro"],
+    "tablet": ["Redmi Pad", "Xiaomi Pad 6"],
+    "laptop": ["RedmiBook 15", "Xiaomi Book Air 13"]
+  },
+  "Huawei": {
+    "phone": ["Mate 60 Pro", "Mate 60 Pro+", "P60 Pro", "nova 11 Pro", "Mate X5"],
+    "tablet": ["MatePad Pro 13.2", "MatePad 11", "MatePad Pro 12.6"],
+    "laptop": ["MateBook X Pro", "MateBook 16s", "MateBook D16"]
+  }
+}

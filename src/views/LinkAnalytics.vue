@@ -31,10 +31,10 @@
         <n-grid-item span="24">
           <StatisticsCards :stats="linkStats" :icon-color="iconColor" />
         </n-grid-item>
-        <n-grid-item span="24" v-if="timeseriesData.length > 0">
+        <n-grid-item span="24" v-if="displayOptions.timeseries">
           <VisitChart :data="timeseriesData" />
         </n-grid-item>
-        <n-grid-item span="24" v-if="countryData.length > 0">
+        <n-grid-item span="24" v-if="displayOptions.locations">
           <GeoDistribution
             :tabs="locationTabs"
             :country-data="countryData"
@@ -42,7 +42,7 @@
             @tab-change="(key) => (locationType = key as 'country' | 'region' | 'city')"
           />
         </n-grid-item>
-        <n-grid-item span="24 m:12" v-if="referrerData.length > 0">
+        <n-grid-item span="24 m:12" v-if="displayOptions.referrer">
           <MetricsGroup
             title="来源分析"
             :tabs="referrerTabs"
@@ -50,7 +50,7 @@
             @tab-change="(key) => (referrerType = key as 'referer' | 'referer_type')"
           />
         </n-grid-item>
-        <n-grid-item span="24 m:12" v-if="languageData.length > 0">
+        <n-grid-item span="24 m:12" v-if="displayOptions.language">
           <MetricsGroup
             title="语言分析"
             :tabs="languageTabs"
@@ -58,7 +58,7 @@
             @tab-change="(key) => (languageType = key as 'language' | 'timezone')"
           />
         </n-grid-item>
-        <n-grid-item span="24 m:12" v-if="deviceData.length > 0">
+        <n-grid-item span="24 m:12" v-if="displayOptions.device">
           <MetricsGroup
             title="设备分析"
             :tabs="deviceTabs"
@@ -66,7 +66,7 @@
             @tab-change="(key) => (deviceType = key as 'device_type' | 'brand' | 'device')"
           />
         </n-grid-item>
-        <n-grid-item span="24 m:12" v-if="platformData.length > 0">
+        <n-grid-item span="24 m:12" v-if="displayOptions.platform">
           <MetricsGroup
             title="平台分析"
             :tabs="platformTabs"
@@ -126,6 +126,15 @@ const platformData = ref<MetricsData[]>([])
 
 const currentLink = ref<Link | null>(null)
 
+const displayOptions = ref({
+  timeseries: false,
+  locations: false,
+  referrer: false,
+  language: false,
+  device: false,
+  platform: false,
+})
+
 const shortUrlParam = computed(() => {
   const url = currentLink.value?.shortUrl
   return url ? url.split('/').pop() : undefined
@@ -157,6 +166,16 @@ const fetchAll = async () => {
   languageData.value = language?.data || []
   deviceData.value = device?.data || []
   platformData.value = platform?.data || []
+
+  // 以第一次加载的数据决定是否显示，后续修改 tab 不会导致组件消失
+  displayOptions.value = {
+    timeseries: timeseriesData.value.length > 0,
+    locations: locationData.value.length > 0,
+    referrer: referrerData.value.length > 0,
+    language: languageData.value.length > 0,
+    device: deviceData.value.length > 0,
+    platform: platformData.value.length > 0,
+  }
 }
 
 const displayReferrerData = computed(() => {

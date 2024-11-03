@@ -1,0 +1,22 @@
+{
+  "Apple": {
+    "phone": ["iOS"],
+    "tablet": ["iOS"],
+    "laptop": ["macOS"]
+  },
+  "Samsung": {
+    "phone": ["Android"],
+    "tablet": ["Android"],
+    "laptop": ["Windows"]
+  },
+  "Xiaomi": {
+    "phone": ["Android"],
+    "tablet": ["Android"],
+    "laptop": ["Windows"]
+  },
+  "Huawei": {
+    "phone": ["Android", "HarmonyOS"],
+    "tablet": ["Android", "HarmonyOS"],
+    "laptop": ["Windows"]
+  }
+}

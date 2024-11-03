@@ -61,7 +61,7 @@ export const useLinksStore = defineStore('links', {
       try {
         await this.fetchLinks({
           page: 1,
-          size: 50,
+          size: 20,
           sort: {
             created_at: 'desc',
           },

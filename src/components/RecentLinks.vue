@@ -113,8 +113,8 @@
         <n-spin v-if="loading" size="small" />
         <n-text v-if="noMoreLinks" depth="3">
           {{
-            recentLinks.length >= 50
-              ? '只显示最近 50 条'
+            recentLinks.length >= 20
+              ? '只显示最近 20 条'
               : `${recentLinks.length} 条链接，没有更多了`
           }}
         </n-text>
@@ -156,7 +156,7 @@ const linksStore = useLinksStore()
 
 const recentLinks = computed(() => linksStore.links)
 const displayCount = ref(5)
-const expandedLinks = ref<string[]>([])
+const expandedLinks = ref<number[]>([])
 const loading = ref(false)
 
 const displayedLinks = computed(() => [...recentLinks.value].slice(0, displayCount.value))
@@ -172,7 +172,7 @@ const loadMore = () => {
   }, 200)
 }
 
-const toggleExpand = (link: { id: string }) => {
+const toggleExpand = (link: { id: number }) => {
   const index = expandedLinks.value.indexOf(link.id)
   if (index === -1) {
     expandedLinks.value.push(link.id)
@@ -195,7 +195,7 @@ const copyToClipboard = (text: string) => {
 
 const router = useRouter()
 
-const goToAnalytics = (id: string) => {
+const goToAnalytics = (id: number) => {
   router.push({ path: `/analytics/${id}` })
 }
 </script>

@@ -1,0 +1,6 @@
+{
+  "SearchEngine": ["Google", "Bing", "Baidu", "DuckDuckGo", "Yahoo"],
+  "SocialMedia": ["Facebook", "Twitter", "LinkedIn", "Instagram", "Pinterest"],
+  "Direct": ["Direct"],
+  "Others": ["GitHub", "Reddit", "Medium", "Dev.to", "Stack Overflow"]
+}

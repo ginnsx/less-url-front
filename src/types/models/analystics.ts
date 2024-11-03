@@ -38,7 +38,7 @@ export interface MetricsData {
 }
 
 export interface TimeseriesData {
-  time: string
+  time: number
   visits: number
   visitors: number
 }

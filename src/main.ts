@@ -24,3 +24,10 @@ app.use(pinia)
 setupGuestStore()
 
 app.mount('#app')
+
+// production mock server
+if (process.env.NODE_ENV === 'production') {
+  import('./mockProdServer').then(({ setupProdMockServer }) => {
+    setupProdMockServer()
+  })
+}

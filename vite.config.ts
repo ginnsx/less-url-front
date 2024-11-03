@@ -5,14 +5,16 @@ import vue from '@vitejs/plugin-vue'
 import AutoImport from 'unplugin-auto-import/vite'
 import { viteMockServe } from 'vite-plugin-mock'
 import { NaiveUiResolver } from 'unplugin-vue-components/resolvers'
+
 // https://vitejs.dev/config/
 export default defineConfig(({ mode }) => {
   const env = loadEnv(mode, process.cwd(), '')
+  console.log(env)
   return {
     plugins: [
       vue(),
       viteMockServe({
-        mockPath: 'mocks', // 根目录下的 mock 目录
+        mockPath: 'mocks', // 根目录下的 mocks 目录
         enable: env.VITE_MOCK_SERVER_ENABLE === 'true',
         watchFiles: true,
         logger: true,

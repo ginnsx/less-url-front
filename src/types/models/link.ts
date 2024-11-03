@@ -1,9 +1,10 @@
 export interface Link {
-  id: string
+  id: number
   shortUrl: string
   originalUrl: string
   visits: number
   isCustom: boolean
+  ownerId: string
   createdAt: number
   updatedAt: number
   expiresAt: number

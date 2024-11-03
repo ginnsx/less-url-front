@@ -10,7 +10,7 @@
   >
     <n-form-item path="username" :feedback="emailFeedback" :validation-status="emailValidateStatus">
       <n-auto-complete
-        v-model:value="model.username"
+        v-model:value.trim="model.username"
         :options="options"
         :get-show="(value: string) => value.endsWith('@')"
         :input-props="{
@@ -140,8 +140,8 @@ const doCheckEmail = async (value: string) => {
     async (errors) => {
       if (!errors) {
         try {
-          const exist = await authStore.checkEmail(value)
-          if (!exist) {
+          const exists = await authStore.checkEmail(value.trim())
+          if (!exists) {
             emailFeedback.value = '邮箱未注册'
             emailCheckStatus.value = 'invalid'
           } else {

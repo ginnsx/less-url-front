@@ -1,111 +1,182 @@
 import type { MockMethod } from 'vite-plugin-mock'
+import Mock from 'mockjs'
+import { createResponse, createErrorResponse, getOwnerIdFromRequest } from './utils'
+import type { Link, PaginationResponse } from '@/types'
+import { links, linksWithAnalytics } from './data'
+import { SHORT_URL_PREFIX } from './data/configs'
 
-// 模拟链接数据
-const links = [
-  {
-    id: '1',
-    shortUrl: 'http://short.url/abc123',
-    originalUrl: 'https://example.com/very/long/url/1',
-    visits: 10,
-    isCustom: false,
-    createdAt: new Date('2023-04-01T12:00:00Z').getTime(),
-    updatedAt: new Date('2023-04-01T12:00:00Z').getTime(),
-    expiresAt: new Date('2024-04-01T12:00:00Z').getTime(),
-  },
-  {
-    id: '2',
-    shortUrl: 'http://short.url/def456',
-    originalUrl: 'https://example.com/very/long/url/2',
-    visits: 5,
-    isCustom: false,
-    createdAt: new Date('2023-04-02T14:30:00Z').getTime(),
-    updatedAt: new Date('2023-04-02T14:30:00Z').getTime(),
-    expiresAt: new Date('2024-04-02T14:30:00Z').getTime(),
-  },
-  {
-    id: '3',
-    shortUrl: 'http://short.url/custom',
-    originalUrl: 'https://example.com/very/long/url/3',
-    visits: 15,
-    isCustom: true,
-    createdAt: new Date('2023-04-03T09:15:00Z').getTime(),
-    updatedAt: new Date('2023-04-03T09:15:00Z').getTime(),
-    expiresAt: new Date('2024-04-03T09:15:00Z').getTime(),
-  },
-]
+type LinkKey = keyof Link
+
+// 添加工具函数，转换排序字段名
+function convertSortField(field: string): string {
+  // 转换下划线为驼峰
+  return field.replace(/_([a-z])/g, (_, letter) => letter.toUpperCase())
+}
 
 export default [
+  // Get links list with pagination
   {
     url: '/api/v1/links',
     method: 'get',
-    response: () => {
-      return {
-        code: 200,
-        data: links,
-        message: '获取链接列表成功',
+    response: (req: any) => {
+      const ownerId = getOwnerIdFromRequest(req)
+      const { page = 1, size = 10, sortBy, filters } = req.query
+
+      // Filter by owner
+      let filteredLinks = [...links].filter((link) => link.ownerId === ownerId)
+
+      // Handle search
+      if (filters) {
+        filteredLinks = filteredLinks.filter(
+          (link) => link.shortUrl.includes(filters) || link.originalUrl.includes(filters)
+        )
       }
+
+      // Handle sorting
+      if (sortBy) {
+        const sortFields = sortBy.split(',')
+        filteredLinks.sort((a, b) => {
+          for (const field of sortFields) {
+            const isDesc = field.startsWith('-')
+            const fieldName = convertSortField(field.replace(/^[+-]/, ''))
+
+            if (a[fieldName as LinkKey] === b[fieldName as LinkKey]) continue
+
+            const compareResult = a[fieldName as LinkKey] < b[fieldName as LinkKey] ? -1 : 1
+            return isDesc ? -compareResult : compareResult
+          }
+          return 0
+        })
+      }
+
+      // Handle pagination
+      const start = (page - 1) * size
+      const paginatedLinks = filteredLinks.slice(start, start + size)
+
+      return createResponse<PaginationResponse<Link>>({
+        records: paginatedLinks,
+        total: filteredLinks.length,
+        pages: Math.ceil(filteredLinks.length / Number(size)),
+        current: Number(page),
+        size: Number(size),
+      })
     },
   },
+
+  // Get single link
   {
     url: '/api/v1/links/:id',
     method: 'get',
-    rawResponse: async (req, res) => {
-      const id = req.url?.split('/').pop()
-      const link = links.find((l) => l.id === id)
-      if (link) {
-        res.statusCode = 200
-        res.setHeader('Content-Type', 'application/json')
-        res.end(
-          JSON.stringify({
-            code: 200,
-            data: link,
-            message: '获取链接详情成功',
-          })
-        )
-      } else {
-        res.statusCode = 404
-        res.setHeader('Content-Type', 'application/json')
-        res.end(
-          JSON.stringify({
-            code: 404,
-            message: 'Link not found',
-          })
-        )
-      }
+    response: (opt: any) => {
+      const id = Number(opt.url.split('/').pop())
+      const ownerId = getOwnerIdFromRequest(opt)
+
+      const link = links.find((l) => l.id === id && l.ownerId === ownerId)
+      return link ? createResponse(link) : createErrorResponse(404, 'Link not found')
     },
   },
+
+  // Create link
   {
     url: '/api/v1/links',
     method: 'post',
-    rawResponse: async (req, res) => {
-      let reqbody = ''
-      await new Promise((resolve) => {
-        req.on('data', (chunk) => {
-          reqbody += chunk
-        })
-        req.on('end', () => resolve(undefined))
-      })
-      const { originalUrl, customAlias, expiresAt } = JSON.parse(reqbody)
-      const newLink = {
-        id: String(links.length + 1),
-        shortUrl: `http://short.url/${customAlias || Math.random().toString(36).slice(2, 6)}`,
+    response: (opt: any) => {
+      const { originalUrl, customAlias, expiresAt } = opt.body
+      const ownerId = getOwnerIdFromRequest(opt)
+
+      if (!ownerId) {
+        return createErrorResponse(401, 'Unauthorized')
+      }
+
+      const newLink: Link = {
+        id: links.length + 1,
+        shortUrl: `${SHORT_URL_PREFIX}${customAlias || Mock.Random.string('lower', 6)}`,
         originalUrl,
         visits: 0,
         isCustom: !!customAlias,
-        createdAt: new Date().getTime(),
-        updatedAt: new Date().getTime(),
-        expiresAt: expiresAt || new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).getTime(),
+        createdAt: Date.now(),
+        updatedAt: Date.now(),
+        expiresAt: expiresAt || Date.now() + 30 * 24 * 60 * 60 * 1000,
+        ownerId,
       }
+
       links.push(newLink)
-      res.setHeader('Content-Type', 'application/json')
-      res.statusCode = 200
-      res.end(
-        JSON.stringify({
-          code: 201,
-          data: newLink,
-          message: '创建链接成功',
-        })
-      )
+      // 同时添加到 linksWithAnalytics
+      linksWithAnalytics.push({
+        link: newLink,
+        visits: [],
+      })
+
+      return createResponse(newLink)
+    },
+  },
+
+  {
+    url: '/api/v1/links/counts',
+    method: 'get',
+    response: (opt: any) => {
+      const ownerId = getOwnerIdFromRequest(opt)
+
+      const ownerLinks = linksWithAnalytics.filter((l) => l.link.ownerId === ownerId)
+      const counts = ownerLinks.reduce((acc, curr) => {
+        return acc + curr.visits.length
+      }, 0)
+
+      return createResponse({ links: ownerLinks.length, analytics: counts })
+    },
+  },
+
+  // Update link
+  {
+    url: '/api/v1/links/:id',
+    method: 'put',
+    response: (opt: any) => {
+      const id = Number(opt.url.split('/').pop())
+      const ownerId = getOwnerIdFromRequest(opt)
+
+      const linkIndex = links.findIndex((l) => l.id === id && l.ownerId === ownerId)
+      if (linkIndex === -1) {
+        return createErrorResponse(404, 'Link not found')
+      }
+
+      const updatedLink = {
+        ...links[linkIndex],
+        ...opt.body,
+        updatedAt: Date.now(),
+      }
+
+      links[linkIndex] = updatedLink
+      // 更新 linksWithAnalytics
+      const analyticsIndex = linksWithAnalytics.findIndex((l) => l.link.id === id)
+      if (analyticsIndex !== -1) {
+        linksWithAnalytics[analyticsIndex].link = updatedLink
+      }
+
+      return createResponse(updatedLink)
+    },
+  },
+
+  // Delete link
+  {
+    url: '/api/v1/links/:id',
+    method: 'delete',
+    response: (opt: any) => {
+      const id = Number(opt.url.split('/').pop())
+      const ownerId = getOwnerIdFromRequest(opt)
+
+      const linkIndex = links.findIndex((l) => l.id === id && l.ownerId === ownerId)
+      if (linkIndex === -1) {
+        return createErrorResponse(404, 'Link not found')
+      }
+
+      links.splice(linkIndex, 1)
+      // 同时从 linksWithAnalytics 中删除
+      const analyticsIndex = linksWithAnalytics.findIndex((l) => l.link.id === id)
+      if (analyticsIndex !== -1) {
+        linksWithAnalytics.splice(analyticsIndex, 1)
+      }
+
+      return createResponse(null)
     },
   },
 ] as MockMethod[]

@@ -50,7 +50,7 @@ export const useAuthStore = defineStore('auth', {
     async checkEmail(email: string) {
       try {
         const response = await authApi.checkEmail(email)
-        return response.data.exist
+        return response.data.exists
       } catch (error) {
         console.error('Failed to check email:', error)
         return false
@@ -155,7 +155,7 @@ export const useAuthStore = defineStore('auth', {
         const response = await authApi.migrateGuestData(guestId)
         window['$notification'].success({
           title: '合并本地数据',
-          content: `成功合并 ${response.data.links} 条链接记录和 ${response.data.analytics} 条分析记录`,
+          content: `成功合并 ${response.data.links} 条链接记录`,
         })
         return true
       } catch (error) {
