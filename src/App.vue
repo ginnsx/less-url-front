@@ -7,6 +7,7 @@
             <n-dialog-provider>
               <BaseLayout />
               <n-back-top :right="100" />
+              <SpeedInsights />
             </n-dialog-provider>
           </n-modal-provider>
         </n-notification-provider>
@@ -28,6 +29,7 @@ import {
 import { zhCN, dateZhCN } from 'naive-ui'
 import BaseLayout from './BaseLayout.vue'
 import { useThemesStore } from './stores/themes'
+import { SpeedInsights } from '@vercel/speed-insights/vue'
 
 const themesStore = useThemesStore()
 </script>
