@@ -98,6 +98,7 @@
     "useAuthStore": true,
     "useGuestStore": true,
     "setupGuestStore": true,
-    "useAnalysisStore": true
+    "useAnalysisStore": true,
+    "NButton": true
   }
 }

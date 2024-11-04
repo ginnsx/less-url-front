@@ -11,10 +11,6 @@ LessURL 是一个简单而强大的短链接服务，使用 Vue 3 和 Vite 构�
 ## 🖼️ 预览
 
 ![HomePage](./public/home.png)
-![Dashboard](./public/dashboard.png)
-![Statistics](./public/statistics.jpg)
-![LightMode](./public/home_light.png)
-![StatsLight](./public/statistics_light.jpg)
 
 [在线预览地址](https://lu.prochase.top)（使用 Mock 接口，仅展示数据。）
 
@@ -111,6 +107,7 @@ less-url-front/
    ```dotenv
    VITE_MOCK_SERVER_ENABLE=false
    VITE_API_BASE_URL=https://your-backend-url
+   VITE_MOCK_URL_PREFIX=https://your-short-url-prefix
    ```
 
 ## 🤝 贡献指南
