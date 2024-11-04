@@ -10,7 +10,7 @@ import { setupRouterGuard } from '@/router/guard'
 import piniaPluginPersistedstate from 'pinia-plugin-persistedstate'
 import { setupGuestStore } from '@/stores/guest'
 
-async function bootstrap() {
+function bootstrap() {
   const app = createApp(App)
 
   setupNaiveDiscreteApi()
@@ -26,9 +26,9 @@ async function bootstrap() {
   setupGuestStore()
 
   // 根据环境变量决定是否启用 mock
-  await setupMockServer()
-
-  app.mount('#app')
+  setupMockServer().then(() => {
+    app.mount('#app')
+  })
 }
 
 bootstrap()

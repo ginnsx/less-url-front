@@ -174,7 +174,7 @@ const userMenuOptions = [
 
 const showDrawer = ref(false)
 
-const handleMenuSelect = (key: string) => {
+const handleMenuSelect = () => {
   showDrawer.value = false
 }
 
