@@ -10,11 +10,17 @@ LessURL 是一个简单而强大的短链接服务，使用 Vue 3 和 Vite 构�
 
 ## 🖼️ 预览
 
-![LessURL](./public/preview.png)
+![HomePage](./public/home.png)
+![Dashboard](./public/dashboard.png)
+![Statistics](./public/statistics.jpg)
+![LightMode](./public/home_light.png)
+![StatsLight](./public/statistics_light.jpg)
+
+[在线预览地址](https://lu.prochase.top)（使用 Mock 接口，仅展示数据。）
 
 ## 🔗 相关项目
 
-- [LessURL](https://github.com/xioshe/less-url) - 后端项目
+- [LessURL](https://github.com/xioshe/less-url) - 搭配的后端项目
 
 ## ✨ 主要功能
 
@@ -25,7 +31,7 @@ LessURL 是一个简单而强大的短链接服务，使用 Vue 3 和 Vite 构�
 - 📊 访问记录可视化
 - 🔍 高级搜索和过滤
 - 📱 响应式设计，支持移动端和桌面端
-- 🌓 深色模式支持
+- 🌓 暗黑模式支持
 
 ## 🛠️ 技术栈
 
@@ -43,6 +49,7 @@ LessURL 是一个简单而强大的短链接服务，使用 Vue 3 和 Vite 构�
 
 ```plain
 less-url-front/
+├── mocks/
 ├── public/
 ├── src/
 │   ├── api/
@@ -71,7 +78,7 @@ less-url-front/
 1. 克隆仓库
 
    ```bash
-   git clone https://github.com/yourusername/less-url-front.git
+   git clone https://github.com/xioshe/less-url-front.git
    cd less-url-front
    ```
 
@@ -95,6 +102,15 @@ less-url-front/
 
    ```bash
    npm run build
+   ```
+
+6. 切换真实后端
+
+   修改 `.env` 或 `.env.production` 文件
+
+   ```dotenv
+   VITE_MOCK_SERVER_ENABLE=false
+   VITE_API_BASE_URL=https://your-backend-url
    ```
 
 ## 🤝 贡献指南
