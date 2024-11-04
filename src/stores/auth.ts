@@ -50,7 +50,7 @@ export const useAuthStore = defineStore('auth', {
     async checkEmail(email: string) {
       try {
         const result = await authApi.checkEmail(email)
-        return result.exist
+        return result.exists
       } catch (error) {
         console.error('Failed to check email:', error)
         return false

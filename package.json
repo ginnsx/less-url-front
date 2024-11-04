@@ -27,6 +27,7 @@
     "grapheme-splitter": "^1.0.4",
     "lodash-es": "^4.17.21",
     "mockjs": "^1.1.0",
+    "msw": "^2.6.0",
     "pinia": "^2.1.7",
     "pinia-plugin-persistedstate": "^4.1.1",
     "vfonts": "^0.0.3",
@@ -51,7 +52,9 @@
     "unplugin-auto-import": "^0.18.3",
     "unplugin-vue-components": "^0.27.4",
     "vite": "^5.3.1",
-    "vite-plugin-mock": "^3.0.2",
     "vue-tsc": "^2.0.21"
+  },
+  "msw": {
+    "workerDirectory": "public"
   }
 }

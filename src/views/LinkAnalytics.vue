@@ -39,7 +39,7 @@
             :tabs="locationTabs"
             :country-data="countryData"
             :location-data="locationData"
-            @tab-change="(key) => (locationType = key as 'country' | 'region' | 'city')"
+            @tab-change="(key: string) => (locationType = key as 'country' | 'region' | 'city')"
           />
         </n-grid-item>
         <n-grid-item span="24 m:12" v-if="displayOptions.referrer">
@@ -47,7 +47,7 @@
             title="来源分析"
             :tabs="referrerTabs"
             :data="displayReferrerData"
-            @tab-change="(key) => (referrerType = key as 'referer' | 'referer_type')"
+            @tab-change="(key: string) => (referrerType = key as 'referer' | 'referer_type')"
           />
         </n-grid-item>
         <n-grid-item span="24 m:12" v-if="displayOptions.language">
@@ -55,7 +55,7 @@
             title="语言分析"
             :tabs="languageTabs"
             :data="displayLanguageData"
-            @tab-change="(key) => (languageType = key as 'language' | 'timezone')"
+            @tab-change="(key: string) => (languageType = key as 'language' | 'timezone')"
           />
         </n-grid-item>
         <n-grid-item span="24 m:12" v-if="displayOptions.device">
@@ -63,7 +63,7 @@
             title="设备分析"
             :tabs="deviceTabs"
             :data="displayDeviceData"
-            @tab-change="(key) => (deviceType = key as 'device_type' | 'brand' | 'device')"
+            @tab-change="(key: string) => (deviceType = key as 'device_type' | 'brand' | 'device')"
           />
         </n-grid-item>
         <n-grid-item span="24 m:12" v-if="displayOptions.platform">
@@ -71,7 +71,7 @@
             title="平台分析"
             :tabs="platformTabs"
             :data="displayPlatformData"
-            @tab-change="(key) => (platformType = key as 'os' | 'browser')"
+            @tab-change="(key: string) => (platformType = key as 'os' | 'browser')"
           />
         </n-grid-item>
       </n-grid>

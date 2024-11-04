@@ -17,6 +17,7 @@ export const users: User[] = [
   {
     userId: '1',
     email: 'test@example.com',
+    password: '123456',
     nickname: 'testuser',
     authorities: [{ authority: 'ROLE_USER' }],
   },
@@ -70,7 +71,7 @@ function generateLocationInfo(): LocationInfo {
     const city = cityName.split(' ')[1]
 
     return {
-      country: '中国',
+      country: 'China',
       region,
       city,
     }

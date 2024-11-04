@@ -13,6 +13,7 @@ export interface AuthResponse {
 export interface User {
   userId: string
   email: string
+  password?: string
   nickname: string
   authorities: { authority: string }[]
 }
