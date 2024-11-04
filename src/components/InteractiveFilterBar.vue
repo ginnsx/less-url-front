@@ -31,7 +31,7 @@
           查询
         </n-button>
       </n-flex>
-      <n-flex wrap>
+      <n-flex wrap :vertical="isMobile">
         <n-tag
           v-for="(quickFilter, index) in quickFilters"
           :disabled="unAvailableFilterFields.has(quickFilter.filter.field)"
@@ -50,6 +50,7 @@
           :key="index"
           align="center"
           :wrap="false"
+          :vertical="isMobile"
           class="filter-item"
         >
           <n-select
@@ -101,6 +102,10 @@ import {
   NIcon,
 } from 'naive-ui'
 import { AddOutline, TrashOutline } from '@vicons/ionicons5'
+import { useWindowSize } from '@vueuse/core'
+
+const { width } = useWindowSize()
+const isMobile = computed(() => width.value < 768)
 
 const operatorDict = new Map([
   ['contains', '包含'],

@@ -17,9 +17,10 @@
       :pagination="pagination"
       :bordered="false"
       :single-line="true"
-      :scroll-x="1800"
+      :scroll-x="1720"
       :row-key="(row) => row.id"
       @update:sorter="handleSorterChange"
+      class="link-list-table"
     />
   </div>
 </template>
@@ -47,6 +48,10 @@ import type { Filter, FilterOption } from './InteractiveFilterBar.vue'
 import InteractiveFilterBar from './InteractiveFilterBar.vue'
 import type { Link, SortParams } from '@/types'
 import { storeToRefs } from 'pinia'
+import { useWindowSize } from '@vueuse/core'
+
+const { width } = useWindowSize()
+const isMobile = computed(() => width.value < 768)
 
 const linksStore = useLinksStore()
 const { links, loading, currentPage, pageSize, total, totalPages } = storeToRefs(linksStore)
@@ -76,7 +81,7 @@ const columns = computed<DataTableColumns<Link>>(() => [
         }
       )
     },
-    fixed: 'left',
+    fixed: !isMobile.value ? 'left' : undefined,
     width: 250,
   },
   {
@@ -182,7 +187,7 @@ const columns = computed<DataTableColumns<Link>>(() => [
         }
       )
     },
-    fixed: 'right',
+    fixed: !isMobile.value ? 'right' : undefined,
   },
 ])
 
@@ -382,6 +387,12 @@ const copyToClipboard = (text: string) => {
   display: flex;
   flex-direction: column;
   gap: 16px;
+}
+
+@media (max-width: 768px) {
+  .link-list-table {
+    width: 100%;
+  }
 }
 
 :deep(.n-form-item-label) {
