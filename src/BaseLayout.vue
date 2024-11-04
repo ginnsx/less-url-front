@@ -9,7 +9,7 @@
             {{ logoText }}
           </n-text>
         </router-link>
-        <div class="header-right">
+        <div class="header-right desktop-only">
           <n-button text @click="themesStore.toggleTheme()" class="theme-toggle">
             <template #icon>
               <n-icon size="22">
@@ -17,7 +17,7 @@
               </n-icon>
             </template>
           </n-button>
-          <n-menu mode="horizontal" :options="menuOptions" :value="activeMenu" responsive />
+          <n-menu mode="horizontal" :options="menuOptions" :value="activeMenu" />
           <n-dropdown
             v-if="authStore.isAuthenticated"
             trigger="hover"
@@ -31,6 +31,22 @@
             </n-space>
           </n-dropdown>
           <n-button v-else text @click="goToAuth">登录</n-button>
+        </div>
+        <div class="header-right mobile-only">
+          <n-button text @click="themesStore.toggleTheme()" class="theme-toggle">
+            <template #icon>
+              <n-icon size="24">
+                <component :is="themeIcon" />
+              </n-icon>
+            </template>
+          </n-button>
+          <n-button text @click="showDrawer = true">
+            <template #icon>
+              <n-icon size="24">
+                <menu-icon />
+              </n-icon>
+            </template>
+          </n-button>
         </div>
       </div>
     </n-layout-header>
@@ -47,6 +63,20 @@
     <n-layout-footer bordered class="footer">
       <n-text>LessURL © {{ new Date().getFullYear() }}</n-text>
     </n-layout-footer>
+    <n-drawer v-model:show="showDrawer" :width="280" placement="right">
+      <n-drawer-content>
+        <n-menu :options="menuOptions" :value="activeMenu" @update:value="handleMenuSelect" />
+        <n-space vertical justify="center" align="center" style="margin-top: 16px">
+          <template v-if="authStore.isAuthenticated">
+            <n-avatar round size="large" :color="avatarColor">
+              {{ avatarText }}
+            </n-avatar>
+            <n-menu :options="userMenuOptions" @update:value="handleUserMenuSelect" />
+          </template>
+          <n-button v-else @click="goToAuth">登录</n-button>
+        </n-space>
+      </n-drawer-content>
+    </n-drawer>
   </n-layout>
 </template>
 
@@ -67,6 +97,8 @@ import {
   NSpace,
   useDialog,
   useMessage,
+  NDrawer,
+  NDrawerContent,
 } from 'naive-ui'
 import { RouterLink } from 'vue-router'
 import { SunnyOutline, MoonOutline } from '@vicons/ionicons5'
@@ -78,6 +110,7 @@ import {
   LogOutOutline as LogoutIcon,
   PersonCircleOutline as UserIcon,
 } from '@vicons/ionicons5'
+import { Menu as MenuIcon } from '@vicons/ionicons5'
 
 const themesStore = useThemesStore()
 const authStore = useAuthStore()
@@ -139,7 +172,14 @@ const userMenuOptions = [
   },
 ]
 
+const showDrawer = ref(false)
+
+const handleMenuSelect = (key: string) => {
+  showDrawer.value = false
+}
+
 const handleUserMenuSelect = (key: string) => {
+  showDrawer.value = false
   if (key === 'logout') {
     showLogoutConfirmation()
   } else {
@@ -275,5 +315,26 @@ function renderIcon(icon: Component) {
 /* 为下拉菜单添加过渡效果 */
 :deep(.n-dropdown-menu) {
   transition: all 0.3s ease;
+}
+
+.desktop-only {
+  display: flex;
+  align-items: center;
+}
+
+.mobile-only {
+  display: none;
+  align-items: center;
+  gap: 8px;
+}
+
+@media screen and (max-width: 768px) {
+  .desktop-only {
+    display: none;
+  }
+
+  .mobile-only {
+    display: flex;
+  }
 }
 </style>
