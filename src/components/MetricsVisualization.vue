@@ -1,7 +1,7 @@
 <template>
   <div>
     <n-flex vertical align="stretch">
-      <div flex="1" style="height: 350px">
+      <div flex="1" :style="{ height: isMobile ? '330px' : '400px' }">
         <ProgressList :data="limitedData" />
         <div class="view-more" v-if="data.length > 5">
           <n-button text type="default" @click="showDetailsModal = true" class="view-more-btn">
@@ -13,7 +13,12 @@
         </div>
       </div>
 
-      <PieChart ref="pieChartRef" :data="limitedData" :theme="themeName" :height="400" />
+      <PieChart
+        ref="pieChartRef"
+        :data="limitedData"
+        :theme="themeName"
+        :height="isMobile ? 300 : 400"
+      />
     </n-flex>
 
     <!-- 详细数据弹窗 -->
@@ -38,6 +43,7 @@ import PieChart from './PieChart.vue'
 import { debounce } from 'lodash-es'
 import { ScanOutline } from '@vicons/ionicons5'
 import type { MetricsData } from '@/types'
+import { useWindowSize } from '@vueuse/core'
 
 interface Props {
   data: MetricsData[]
@@ -73,6 +79,9 @@ const showDetailsModal = ref(false)
 const limitedData = computed(() => {
   return props.data.slice(0, 5)
 })
+
+const { width } = useWindowSize()
+const isMobile = computed(() => width.value <= 768)
 </script>
 
 <style scoped>

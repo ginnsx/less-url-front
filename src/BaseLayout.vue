@@ -17,7 +17,7 @@
               </n-icon>
             </template>
           </n-button>
-          <n-menu mode="horizontal" :options="menuOptions" :value="activeMenu" />
+          <n-menu mode="horizontal" :options="menuOptions" :value="activeMenu" responsive />
           <n-dropdown
             v-if="authStore.isAuthenticated"
             trigger="hover"
@@ -198,6 +198,12 @@ function renderIcon(icon: Component) {
   display: flex;
   align-items: center;
   gap: 16px;
+}
+
+@media screen and (max-width: 768px) {
+  .header-right {
+    gap: 8px;
+  }
 }
 
 .footer {

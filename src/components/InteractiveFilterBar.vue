@@ -576,17 +576,34 @@ const mergeComparisonFilters = (filters: Filter[], operators: ComparisonOperator
 }
 
 .filter-field {
-  min-width: 180px;
-  margin-right: 18px;
+  min-width: 120px;
+  width: 100%;
+  margin-right: 8px;
 }
 
 .filter-operator {
-  min-width: 120px;
-  margin-right: 18px;
+  min-width: 100px;
+  width: 100%;
+  margin-right: 8px;
 }
 
 .filter-input {
-  min-width: 220px;
+  min-width: 160px;
+  width: 100%;
+}
+
+@media screen and (max-width: 768px) {
+  .filter-item {
+    flex-direction: column;
+    gap: 8px;
+    width: 100%;
+  }
+
+  .filter-field,
+  .filter-operator,
+  .filter-input {
+    margin-right: 0;
+  }
 }
 
 .remove-filter-btn {

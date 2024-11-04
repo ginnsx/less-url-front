@@ -1,6 +1,6 @@
 <template>
   <div class="overview-stats">
-    <n-grid :x-gap="12" :y-gap="8" :cols="4" responsive="screen">
+    <n-grid :x-gap="12" :y-gap="8" :cols="isMobile ? 2 : 4" responsive="screen">
       <n-gi v-for="stat in stats" :key="stat.label">
         <n-card class="stat-card">
           <n-statistic :label="stat.label" tabular-nums>
@@ -27,6 +27,10 @@ import { NGrid, NGi, NStatistic, NIcon, NText, NCard, NNumberAnimation } from 'n
 import { LinkOutline, EyeOutline, TrendingUpOutline, CalendarOutline } from '@vicons/ionicons5'
 import dayjs from 'dayjs'
 import { type LinkDataCounts, type Link } from '@/types'
+import { useWindowSize } from '@vueuse/core'
+
+const { width } = useWindowSize()
+const isMobile = computed(() => width.value <= 768)
 
 const linksStore = useLinksStore()
 

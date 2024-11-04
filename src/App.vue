@@ -86,4 +86,19 @@ select:-webkit-autofill:active {
     transform: translateY(0);
   }
 }
+
+@media screen and (max-width: 768px) {
+  .n-card {
+    padding: 12px !important;
+  }
+
+  .n-input {
+    font-size: 14px !important;
+  }
+
+  .n-button {
+    font-size: 14px !important;
+    padding: 6px 12px !important;
+  }
+}
 </style>

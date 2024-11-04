@@ -1,5 +1,5 @@
 <template>
-  <n-grid :x-gap="12" :y-gap="8" :cols="3">
+  <n-grid :x-gap="12" :y-gap="8" :cols="isMobile ? 1 : 3">
     <n-gi v-for="stat in stats" :key="stat.label">
       <n-card class="stat-card">
         <n-statistic :label="stat.label" tabular-nums>
@@ -20,7 +20,12 @@
 
 <script setup lang="ts">
 import type { Component } from 'vue'
+import { computed } from 'vue'
 import { NCard, NGrid, NGi, NIcon, NStatistic, NNumberAnimation, NText } from 'naive-ui'
+import { useWindowSize } from '@vueuse/core'
+
+const { width } = useWindowSize()
+const isMobile = computed(() => width.value <= 768)
 
 interface Stat {
   label: string

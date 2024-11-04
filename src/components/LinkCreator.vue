@@ -24,7 +24,7 @@
 
       <n-collapse-transition :show="showAdvancedSettings">
         <n-form-item label="高级设置" class="advanced-settings">
-          <n-grid :cols="2" :x-gap="12">
+          <n-grid :cols="isMobile ? 1 : 2" :x-gap="12" :y-gap="12">
             <n-form-item-gi path="customAlias">
               <n-input
                 v-model:value="model.customAlias"
@@ -106,7 +106,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, reactive } from 'vue'
+import { ref, reactive, computed } from 'vue'
 import { useLinksStore } from '@/stores/links'
 import {
   NForm,
@@ -134,6 +134,7 @@ import type { ValidateError } from 'async-validator'
 import QRCode from './QRCode.vue'
 import { CheckmarkDoneSharp, CopySharp, CheckmarkSharp } from '@vicons/ionicons5'
 import dayjs from 'dayjs'
+import { useWindowSize } from '@vueuse/core'
 
 const emit = defineEmits(['create'])
 
@@ -261,6 +262,9 @@ const disablePreviousTime = () => {
     },
   }
 }
+
+const { width } = useWindowSize()
+const isMobile = computed(() => width.value <= 768)
 </script>
 <style scoped>
 .link-creator {

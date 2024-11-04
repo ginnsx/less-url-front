@@ -12,13 +12,13 @@
               <n-tag type="info" size="small"> 访问次数: {{ link.visits || 0 }} </n-tag>
             </template>
             <template #description>
-              <n-ellipsis style="max-width: 400px">
+              <n-ellipsis :style="{ maxWidth: '100%' }">
                 {{ link.originalUrl }}
               </n-ellipsis>
             </template>
             <template #footer>
-              <n-grid :cols="2" :x-gap="16">
-                <n-grid-item>
+              <n-grid :cols="24" :x-gap="16" :item-responsive="true">
+                <n-grid-item span="24 m:12">
                   <n-flex align="center">
                     <span>过期时间:</span>
                     <n-tag
@@ -30,7 +30,7 @@
                     </n-tag>
                   </n-flex>
                 </n-grid-item>
-                <n-grid-item>
+                <n-grid-item span="24 m:12">
                   <n-flex align="center">
                     <span> 创建时间:</span>
                     <n-tag
@@ -45,8 +45,8 @@
               </n-grid>
               <n-collapse-transition :show="expandedLinks.includes(link.id)">
                 <div class="expanded-content">
-                  <n-grid :cols="24" :x-gap="16">
-                    <n-grid-item :span="16">
+                  <n-grid :cols="24" :x-gap="16" :y-gap="16" :item-responsive="true">
+                    <n-grid-item span="24 m:16">
                       <n-flex vertical :size="16">
                         <n-input-group>
                           <n-input-group-label>短链接</n-input-group-label>
@@ -97,7 +97,7 @@
                         </n-flex>
                       </n-flex>
                     </n-grid-item>
-                    <n-grid-item :span="8">
+                    <n-grid-item span="24 m:8">
                       <n-flex vertical align="center" justify="space-between" style="height: 100%">
                         <QRCode :value="link.shortUrl" :size="200" />
                       </n-flex>
@@ -240,5 +240,21 @@ const goToAnalytics = (id: number) => {
 :deep(.n-list-item:hover) {
   transform: translateY(-3px);
   box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+}
+
+/* 添加响应式样式 */
+@media (max-width: 768px) {
+  .gradient-text {
+    font-size: 1.5rem;
+    margin-bottom: 16px;
+  }
+
+  .short-url {
+    font-size: 1rem;
+  }
+
+  .expanded-content {
+    margin-top: 12px;
+  }
 }
 </style>
