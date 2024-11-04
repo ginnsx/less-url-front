@@ -3,7 +3,7 @@ import { faker } from '@faker-js/faker'
 import { jsonResponse, errorResponse } from '../utils/response'
 import { getOwnerIdFromRequest } from '../utils/response'
 import { links, linksWithAnalytics } from '../data'
-import { SHORT_URL_PREFIX } from '../data/configs'
+import { SHORT_URL_PREFIX } from '../config'
 import type { Link, PaginationResponse } from '@/types'
 
 type LinkKey = keyof Link

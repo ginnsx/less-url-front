@@ -9,8 +9,6 @@ export const TIME_CONSTANTS = {
   ONE_YEAR_LATER: Date.now() + 365 * 24 * 60 * 60 * 1000,
 } as const
 
-export const SHORT_URL_PREFIX = 'http://short.url/'
-
 export const deviceMapping: DeviceMapping = deviceMappingJson
 export const osMapping: OsMapping = osMappingJson
 export const refererMapping: RefererMapping = refererMappingJson

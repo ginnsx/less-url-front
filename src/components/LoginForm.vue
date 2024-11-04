@@ -79,9 +79,11 @@ const formRef = ref<FormInst | null>(null)
 const message = useMessage()
 const authStore = useAuthStore()
 
+const isMock = import.meta.env.VITE_MOCK_SERVER_ENABLE === 'true'
+
 const model = reactive({
-  username: '',
-  password: '',
+  username: isMock ? 'test@example.com' : '',
+  password: isMock ? '123456' : '',
   verifyCode: '',
 })
 

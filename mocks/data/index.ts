@@ -9,8 +9,9 @@ import {
   refererMapping,
   browsers,
   languages,
-  SHORT_URL_PREFIX,
 } from './configs'
+
+import { SHORT_URL_PREFIX } from '../config'
 
 // 预设用户
 export const users: User[] = [
