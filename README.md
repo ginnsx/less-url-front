@@ -4,6 +4,7 @@
 ![TypeScript](https://img.shields.io/badge/TypeScript-4.x-3178C6?style=flat-square&logo=typescript)
 ![Vite](https://img.shields.io/badge/Vite-5.x-646CFF?style=flat-square&logo=vite)
 ![Naive UI](https://img.shields.io/badge/Naive%20UI-2.x-18A058?style=flat-square&logo=naive-ui)
+![Mock Service Worker](https://img.shields.io/badge/Mock%20Service%20Worker-2.x-FF6F61?style=flat-square&logo=msw)
 ![License](https://img.shields.io/badge/License-MIT-yellow.svg)
 
 LessURL 是一个简单而强大的短链接服务，使用 Vue 3 和 Vite 构建。它提供了一个直观的用户界面，让用户可以轻松创建、管理和分析短链接。
@@ -28,6 +29,7 @@ LessURL 是一个简单而强大的短链接服务，使用 Vue 3 和 Vite 构�
 - 🔍 高级搜索和过滤
 - 📱 响应式设计，支持移动端和桌面端
 - 🌓 暗黑模式支持
+- 🚀 支持 Mock API
 
 ## 🛠️ 技术栈
 
@@ -102,7 +104,7 @@ less-url-front/
 
 6. 切换真实后端
 
-   修改 `.env` 或 `.env.production` 文件
+   默认使用 [Mock Service Worker](https://mswjs.io/) 提供的 Mock API，如果需要切换到真实后端，修改 `.env` 或 `.env.production` 文件
 
    ```dotenv
    VITE_MOCK_SERVER_ENABLE=false
