@@ -27,54 +27,60 @@
           </n-flex>
         </n-flex>
       </template>
-      <n-grid :cols="24" :x-gap="12" :y-gap="12" :item-responsive="true" responsive="screen">
-        <n-grid-item span="24">
-          <StatisticsCards :stats="linkStats" :icon-color="iconColor" />
-        </n-grid-item>
-        <n-grid-item span="24" v-if="displayOptions.timeseries">
-          <VisitChart :data="timeseriesData" />
-        </n-grid-item>
-        <n-grid-item span="24" v-if="displayOptions.locations">
-          <GeoDistribution
-            :tabs="locationTabs"
-            :country-data="countryData"
-            :location-data="locationData"
-            @tab-change="(key: string) => (locationType = key as 'country' | 'region' | 'city')"
-          />
-        </n-grid-item>
-        <n-grid-item span="24 m:12" v-if="displayOptions.referrer">
-          <MetricsGroup
-            title="来源分析"
-            :tabs="referrerTabs"
-            :data="displayReferrerData"
-            @tab-change="(key: string) => (referrerType = key as 'referer' | 'referer_type')"
-          />
-        </n-grid-item>
-        <n-grid-item span="24 m:12" v-if="displayOptions.language">
-          <MetricsGroup
-            title="语言分析"
-            :tabs="languageTabs"
-            :data="displayLanguageData"
-            @tab-change="(key: string) => (languageType = key as 'language' | 'timezone')"
-          />
-        </n-grid-item>
-        <n-grid-item span="24 m:12" v-if="displayOptions.device">
-          <MetricsGroup
-            title="设备分析"
-            :tabs="deviceTabs"
-            :data="displayDeviceData"
-            @tab-change="(key: string) => (deviceType = key as 'device_type' | 'brand' | 'device')"
-          />
-        </n-grid-item>
-        <n-grid-item span="24 m:12" v-if="displayOptions.platform">
-          <MetricsGroup
-            title="平台分析"
-            :tabs="platformTabs"
-            :data="displayPlatformData"
-            @tab-change="(key: string) => (platformType = key as 'os' | 'browser')"
-          />
-        </n-grid-item>
-      </n-grid>
+
+      <div style="position: relative">
+        <n-grid :cols="24" :x-gap="12" :y-gap="12" :item-responsive="true" responsive="screen">
+          <n-grid-item span="24">
+            <StatisticsCards :stats="linkStats" :icon-color="iconColor" />
+          </n-grid-item>
+          <n-grid-item span="24">
+            <VisitChart :data="timeseriesData" />
+          </n-grid-item>
+          <n-grid-item span="24" v-if="displayOptions.locations">
+            <GeoDistribution
+              :tabs="locationTabs"
+              :country-data="countryData"
+              :location-data="locationData"
+              @tab-change="(key: string) => (locationType = key as 'country' | 'region' | 'city')"
+            />
+          </n-grid-item>
+          <n-grid-item span="24 m:12" v-if="displayOptions.referrer">
+            <MetricsGroup
+              title="来源分析"
+              :tabs="referrerTabs"
+              :data="displayReferrerData"
+              @tab-change="(key: string) => (referrerType = key as 'referer' | 'referer_type')"
+            />
+          </n-grid-item>
+          <n-grid-item span="24 m:12" v-if="displayOptions.language">
+            <MetricsGroup
+              title="语言分析"
+              :tabs="languageTabs"
+              :data="displayLanguageData"
+              @tab-change="(key: string) => (languageType = key as 'language' | 'timezone')"
+            />
+          </n-grid-item>
+          <n-grid-item span="24 m:12" v-if="displayOptions.device">
+            <MetricsGroup
+              title="设备分析"
+              :tabs="deviceTabs"
+              :data="displayDeviceData"
+              @tab-change="
+                (key: string) => (deviceType = key as 'device_type' | 'brand' | 'device')
+              "
+            />
+          </n-grid-item>
+          <n-grid-item span="24 m:12" v-if="displayOptions.platform">
+            <MetricsGroup
+              title="平台分析"
+              :tabs="platformTabs"
+              :data="displayPlatformData"
+              @tab-change="(key: string) => (platformType = key as 'os' | 'browser')"
+            />
+          </n-grid-item>
+        </n-grid>
+        <LoginOverlay v-if="!isAuthenticated" />
+      </div>
     </n-card>
   </div>
 </template>
@@ -98,7 +104,11 @@ import GeoDistribution from '@/components/GeoDistribution.vue'
 import StatisticsCards from '@/components/StatisticsCards.vue'
 import MetricsGroup from '@/components/MetricsGroup.vue'
 import TimeRangeSelector from '@/components/TimeRangeSelector.vue'
+import LoginOverlay from '@/components/LoginOverlay.vue'
 import type { Link, LocationData, BasicData, TimeseriesData, MetricsData } from '@/types'
+import { useAuthStore } from '@/stores/auth'
+
+const isAuthenticated = computed(() => useAuthStore().isAuthenticated)
 
 const message = useMessage()
 const route = useRoute()
@@ -339,8 +349,10 @@ const copyToClipboard = () => {
   animation: fadeIn 0.5s ease-out;
 }
 
+/* 确保卡片有相对定位，以便遮罩层能够正确定位 */
 .n-card {
   flex-grow: 1;
+  position: relative;
 }
 
 .copy-btn {

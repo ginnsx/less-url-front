@@ -38,3 +38,5 @@ dist_electron
 
 /components.d.ts
 /views.d.ts
+.env.development.local
+.env.production.local

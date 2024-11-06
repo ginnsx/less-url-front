@@ -179,6 +179,7 @@ export const useAuthStore = defineStore('auth', {
           closable: true,
           onClose: () => resolve(false),
           onPositiveClick: () => resolve(true),
+          onNegativeClick: () => resolve(false),
         })
       })
     },
