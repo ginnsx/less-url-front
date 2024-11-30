@@ -16,7 +16,7 @@ function showMockMessage() {
     window['$notification'].info({
       title: '当前为 Mock 环境',
       content:
-        '默认用户 `test@example.com`，密码 `123456`。\nMock 服务仅用于展示，不具备实际功能，如需体验完整功能，请部署真实后端服务。',
+        '默认用户 `test@example.com`，密码 `123456`。\nMock 服务仅用于展示，只具备部分功能，如需体验完整功能，请部署真实后端服务。',
     })
   }
 }
